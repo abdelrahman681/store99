@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { LoginDTO, RegisterPayload, UserDTO,ResetPasswordDto,ChangePasswordDTO,RefreshTokenResponse } from '../models/user.model';
 const TOKEN_KEY = 'talabat_token';
@@ -18,7 +18,31 @@ export class AuthService {
   }
 
 
-    private persist(user: UserDTO): void {
+
+  /** Reads the role out of the JWT (works for both the short "role" claim and the long Microsoft one). */
+  private roleFromToken(token?: string | null): string | undefined {
+    if (!token) return undefined;
+    try {
+      const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const claims = JSON.parse(decodeURIComponent(escape(atob(payload))));
+      const role = claims['role'] ?? claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      return Array.isArray(role) ? role[0] : role;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** The current-user endpoint may not return roleName, so fall back to the saved user, then to the token. */
+  private withRole(user: UserDTO): UserDTO {
+    if (user.roleName) return user;
+    const roleName =
+      this.loadUser()?.roleName ??
+      this.roleFromToken(user.token) ??
+      this.roleFromToken(localStorage.getItem(TOKEN_KEY));
+    return roleName ? { ...user, roleName } : user;
+  }
+
+  private persist(user: UserDTO): void {
     localStorage.setItem(TOKEN_KEY, user.token);
     localStorage.setItem(USER_KEY, JSON.stringify(user));
     this.currentUser.set(user);
@@ -51,6 +75,7 @@ getCurrentUser(): Observable<UserDTO> {
   return this.http
     .get<UserDTO>(`${this.baseUrl}/GetCurrentUser`)
     .pipe(
+      map(user => this.withRole(user)),
       tap(user => this.persist(user))
     );
 }
@@ -140,7 +165,7 @@ refreshToken(): Observable<string> {
 
   changePassword(dto: ChangePasswordDTO): Observable<UserDTO> {
     return this.http.put<UserDTO>(`${this.baseUrl}/ChangePassword`, dto)
-      .pipe(tap(user => this.persist(user)));
+      .pipe(map(user => this.withRole(user)), tap(user => this.persist(user)));
   }
   clearSession(): void {
     localStorage.removeItem(TOKEN_KEY);

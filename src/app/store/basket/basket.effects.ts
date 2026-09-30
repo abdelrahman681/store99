@@ -7,6 +7,7 @@ import { BasketService } from '../../core/services/basket.service';
 import { ToastService } from '../../core/services/toast.service';
 import { createEmptyBasket } from '../../core/models/basket.model';
 import { BasketActions } from './basket.actions';
+import { AuthActions } from '../auth/auth.actions';
 import { selectBasket } from './basket.selectors';
 
 @Injectable()
@@ -38,14 +39,13 @@ loadBasket$ = createEffect(() => this.actions$.pipe(
         })
       ),
 
-      catchError(error => {
-
+      catchError((error: HttpErrorResponse) => {
+        // an id the server doesn't know yet is a new, empty basket — not an error
+        if (error.status === 404) {
+          return of(BasketActions.loadBasketSuccess({ basket: createEmptyBasket(id) }));
+        }
         console.error('Load Basket Error:', error);
-
-        return of(
-          BasketActions.loadBasketFailure()
-        );
-
+        return of(BasketActions.loadBasketFailure());
       })
 
     );
@@ -91,5 +91,28 @@ loadBasket$ = createEffect(() => this.actions$.pipe(
       tap(() => this.basketService.clearBasketId()),
       map(() => BasketActions.clearBasketSuccess())
     ))
+  ));
+
+  // Login / register / Google login: switch to this account's own basket and load it.
+  // (Its items were saved on the server under the account's basket id, so they come back.)
+  loadUserBasketOnLogin$ = createEffect(() => this.actions$.pipe(
+    ofType(AuthActions.loginSuccess, AuthActions.googleLoginSuccess, AuthActions.registerSuccess),
+    tap(({ user }) => this.basketService.useUserBasket(user.email)),
+    map(() => BasketActions.loadBasket())
+  ));
+
+  // Logout: only forget the basket locally (the server copy stays, so the same account finds it
+  // again next time). The next visitor / account starts with an empty basket.
+  resetBasketOnLogout$ = createEffect(() => this.actions$.pipe(
+    ofType(AuthActions.logoutSuccess),
+    tap(() => this.basketService.clearBasketId()),
+    map(() => BasketActions.clearBasketSuccess())
+  ));
+
+  // After the basket is cleared (logout, or right after an order) load a fresh empty one,
+  // otherwise the state stays null and "add to basket" silently does nothing.
+  reloadAfterClear$ = createEffect(() => this.actions$.pipe(
+    ofType(BasketActions.clearBasketSuccess),
+    map(() => BasketActions.loadBasket())
   ));
 }

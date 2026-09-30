@@ -1,12 +1,12 @@
 :root {
-  --brand: #4f46e5;
-  --brand-dark: #4338ca;
-  --brand-soft: #eef2ff;
-  --ink: #0f172a;
-  --ink-2: #334155;
-  --muted: #64748b;
-  --line: #e5e7ef;
-  --bg: #f5f6fb;
+  --brand: #c2410c;
+  --brand-dark: #9a3412;
+  --brand-soft: #fdf0e6;
+  --ink: #1c1917;
+  --ink-2: #44403c;
+  --muted: #78716c;
+  --line: #e4dfd6;
+  --bg: #f6f4f0;
   --surface: #ffffff;
   --success: #16a34a;
   --danger: #dc2626;
@@ -19,16 +19,16 @@
   --shadow-md: 0 12px 32px rgba(15, 23, 42, .12);
 
   // Re-point Bootstrap's own tokens so every .text-primary / .bg-primary / link follows the brand colour
-  --bs-primary: #4f46e5;
-  --bs-primary-rgb: 79, 70, 229;
-  --bs-link-color: #4f46e5;
-  --bs-link-color-rgb: 79, 70, 229;
-  --bs-link-hover-color: #4338ca;
-  --bs-link-hover-color-rgb: 67, 56, 202;
+  --bs-primary: #c2410c;
+  --bs-primary-rgb: 194, 65, 12;
+  --bs-link-color: #c2410c;
+  --bs-link-color-rgb: 194, 65, 12;
+  --bs-link-hover-color: #9a3412;
+  --bs-link-hover-color-rgb: 154, 52, 18;
   --bs-body-font-family: 'Cairo', 'Segoe UI', Tahoma, system-ui, sans-serif;
-  --bs-body-color: #0f172a;
-  --bs-body-bg: #f5f6fb;
-  --bs-border-color: #e5e7ef;
+  --bs-body-color: #1c1917;
+  --bs-body-bg: #f6f4f0;
+  --bs-border-color: #e4dfd6;
 }
 
 *, *::before, *::after { -webkit-tap-highlight-color: transparent; }
@@ -49,10 +49,10 @@ a { text-decoration: none; }
 
 h1, h2, h3, h4, h5, h6 { font-weight: 800; color: var(--ink); }
 
-::selection { background: rgba(79, 70, 229, .18); }
+::selection { background: rgba(194, 65, 12, .18); }
 
 // Accessible focus ring for keyboard users only
-:focus-visible { outline: 3px solid rgba(79, 70, 229, .45); outline-offset: 2px; }
+:focus-visible { outline: 3px solid rgba(194, 65, 12, .45); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }

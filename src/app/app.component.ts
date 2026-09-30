@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
@@ -9,13 +10,14 @@ import { FooterComponent } from './shared/components/footer/footer.component';
 import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
 import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confirm-dialog.component';
 import { AuthActions } from './store/auth/auth.actions';
+import { AuthService } from './core/services/auth.service';
 import { BasketActions } from './store/basket/basket.actions';
 import { ProductsActions } from './store/products/products.actions';
 
 // On the products page the logo stays at least this long (so it never just flashes) and until products arrive;
 // when the app is opened straight on another page it only shows briefly.
-const MIN_SPLASH_MS = 1500;
-const MIN_SPLASH_OTHER_MS = 600;
+const MIN_SPLASH_MS = 2600; // long enough for the logo animation to finish
+const MIN_SPLASH_OTHER_MS = 2600;
 const MAX_SPLASH_MS = 8000;
 const SPLASH_FADE_MS = 600;
 
@@ -24,22 +26,6 @@ const SPLASH_FADE_MS = 600;
   standalone: true,
   imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastContainerComponent, ConfirmDialogComponent],
   template: `
-    @if (splashVisible()) {
-      <div class="app-splash" [class.is-leaving]="splashLeaving()" role="status" aria-label="جاري التحميل">
-        <div class="app-splash__logo">
-          <span class="app-splash__ring"></span>
-          <span class="app-splash__pulse"></span>
-          <svg class="app-splash__bag" viewBox="0 0 64 64" width="46" height="46" fill="none" stroke="currentColor"
-               stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M14 22h36l-3 30a4 4 0 0 1-4 3.6H21a4 4 0 0 1-4-3.6L14 22z"/>
-            <path d="M23 22v-3a9 9 0 0 1 18 0v3"/>
-          </svg>
-        </div>
-        <div class="app-splash__brand">Store99</div>
-        <div class="app-splash__dots"><span></span><span></span><span></span></div>
-      </div>
-    }
-
     <div class="app-shell">
       <app-navbar></app-navbar>
       <main class="app-main">
@@ -58,15 +44,19 @@ export class AppComponent implements OnInit {
   private store = inject(Store);
   private router = inject(Router);
   private actions$ = inject(Actions);
+  private authService = inject(AuthService);
 
-  splashVisible = signal(true);
-  splashLeaving = signal(false);
+  private document = inject(DOCUMENT);
 
   ngOnInit(): void {
     this.startSplash();
 
     // Restore session (the token is saved by AuthService / the auth interceptor under this key)
     if (localStorage.getItem('talabat_token')) {
+      // Show the saved user right away (so the navbar keeps the dashboard link after a refresh),
+      // then refresh it from the API.
+      const saved = this.authService.currentUser();
+      if (saved) this.store.dispatch(AuthActions.loadCurrentUserSuccess({ user: saved }));
       this.store.dispatch(AuthActions.loadCurrentUser());
     }
     this.store.dispatch(BasketActions.loadBasket());
@@ -110,7 +100,10 @@ export class AppComponent implements OnInit {
   }
 
   private hideSplash(): void {
-    this.splashLeaving.set(true);
-    setTimeout(() => this.splashVisible.set(false), SPLASH_FADE_MS);
+    // the splash is plain HTML in index.html — fade it out, then remove it
+    const splash = this.document.getElementById('app-splash');
+    if (!splash) return;
+    splash.classList.add('is-leaving');
+    setTimeout(() => splash.remove(), SPLASH_FADE_MS);
   }
 }
