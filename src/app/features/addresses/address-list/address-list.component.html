@@ -25,41 +25,13 @@
             <div class="invalid-feedback">المدينة مطلوبة</div>
           </div>
           <div class="col-6">
-            <label class="form-label"  for="government">المحافظة</label>
-            <input id="government" list="governments" class="form-control" formControlName="government"
-                   [class.is-invalid]="form.controls['government'].invalid && form.controls['government'].touched">
+            <label class="form-label" for="government">المحافظة</label>
+            <input id="government" class="form-control" formControlName="government"
+                   [class.is-invalid]="form.controls['government'].invalid && form.controls['country'].touched">
             <div class="invalid-feedback">المحافظة مطلوبة</div>
           </div>
         </div>
-<datalist id="governments">
-  <option value="القاهرة"></option>
-  <option value="الجيزة"></option>
-  <option value="الإسكندرية"></option>
-  <option value="القليوبية"></option>
-  <option value="الدقهلية"></option>
-  <option value="الشرقية"></option>
-  <option value="الغربية"></option>
-  <option value="المنوفية"></option>
-  <option value="البحيرة"></option>
-  <option value="كفر الشيخ"></option>
-  <option value="دمياط"></option>
-  <option value="بورسعيد"></option>
-  <option value="الإسماعيلية"></option>
-  <option value="السويس"></option>
-  <option value="شمال سيناء"></option>
-  <option value="جنوب سيناء"></option>
-  <option value="البحر الأحمر"></option>
-  <option value="الفيوم"></option>
-  <option value="بني سويف"></option>
-  <option value="المنيا"></option>
-  <option value="أسيوط"></option>
-  <option value="سوهاج"></option>
-  <option value="قنا"></option>
-  <option value="الأقصر"></option>
-  <option value="أسوان"></option>
-  <option value="الوادي الجديد"></option>
-  <option value="مطروح"></option>
-</datalist>
+
         <div class="d-flex gap-2 mt-4">
           <button class="btn btn-primary flex-grow-1" [disabled]="saving">
             @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
