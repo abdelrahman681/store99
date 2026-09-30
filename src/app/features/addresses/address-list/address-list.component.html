@@ -1,81 +1,274 @@
 <div class="page-head">
-  <h1 class="page-title"><i class="fa-solid fa-location-dot"></i> عناويني</h1>
+  <h1 class="page-title">
+    <i class="fa-solid fa-location-dot"></i> عناويني
+  </h1>
 </div>
 
 <div class="row g-3 g-lg-4">
 
   <!-- Form -->
+
   <div class="col-lg-5">
     <div class="surface p-3 p-md-4 summary-card">
-      <h5 class="mb-3">{{ editingId ? 'تعديل العنوان' : 'إضافة عنوان جديد' }}</h5>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-        <div class="mb-3">
-          <label class="form-label" for="street">الشارع</label>
-          <input id="street" class="form-control" formControlName="street" placeholder="اسم الشارع ورقم المبنى"
-                 [class.is-invalid]="form.controls['street'].invalid && form.controls['street'].touched">
-          <div class="invalid-feedback">الشارع مطلوب</div>
-        </div>
+  <h5 class="mb-3">
+    {{ editingId ? 'تعديل العنوان' : 'إضافة عنوان جديد' }}
+  </h5>
 
-        <div class="row g-3">
-          <div class="col-6">
-            <label class="form-label" for="city">المدينة</label>
-            <input id="city" class="form-control" formControlName="city"
-                   [class.is-invalid]="form.controls['city'].invalid && form.controls['city'].touched">
-            <div class="invalid-feedback">المدينة مطلوبة</div>
-          </div>
-          <div class="col-6">
-            <label class="form-label" for="government">المحافظة</label>
-            <input id="government" class="form-control" formControlName="government"
-                   [class.is-invalid]="form.controls['government'].invalid && form.controls['country'].touched">
-            <div class="invalid-feedback">المحافظة مطلوبة</div>
-          </div>
-        </div>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
-        <div class="d-flex gap-2 mt-4">
-          <button class="btn btn-primary flex-grow-1" [disabled]="saving">
-            @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
-            {{ editingId ? 'حفظ التعديل' : 'إضافة العنوان' }}
-          </button>
-          @if (editingId) {
-            <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">إلغاء</button>
-          }
-        </div>
-      </form>
+    <!-- Street -->
+    <div class="mb-3">
+      <label class="form-label" for="street">الشارع</label>
+
+      <input
+        id="street"
+        class="form-control"
+        formControlName="street"
+        placeholder="اسم الشارع ورقم المبنى"
+        [class.is-invalid]="
+          form.controls['street'].invalid &&
+          form.controls['street'].touched
+        "
+      >
+
+      <div class="invalid-feedback">
+        الشارع مطلوب
+      </div>
     </div>
+
+
+    <!-- Government + City -->
+    <div class="row g-3">
+
+      <!-- Government -->
+      <div class="col-6">
+
+        <label class="form-label" for="government">
+          المحافظة
+        </label>
+
+        <input
+          id="government"
+          list="governments"
+          class="form-control"
+          formControlName="government"
+          (change)="onGovernmentChange()"
+          placeholder="اختر المحافظة"
+          [class.is-invalid]="
+            form.controls['government'].invalid &&
+            form.controls['government'].touched
+          "
+        >
+
+        <div class="invalid-feedback">
+          المحافظة مطلوبة
+        </div>
+
+        <datalist id="governments">
+          <option value="القاهرة"></option>
+          <option value="الجيزة"></option>
+          <option value="الإسكندرية"></option>
+          <option value="القليوبية"></option>
+          <option value="الدقهلية"></option>
+          <option value="الشرقية"></option>
+          <option value="الغربية"></option>
+          <option value="المنوفية"></option>
+          <option value="البحيرة"></option>
+          <option value="كفر الشيخ"></option>
+          <option value="دمياط"></option>
+          <option value="بورسعيد"></option>
+          <option value="الإسماعيلية"></option>
+          <option value="السويس"></option>
+          <option value="شمال سيناء"></option>
+          <option value="جنوب سيناء"></option>
+          <option value="البحر الأحمر"></option>
+          <option value="الفيوم"></option>
+          <option value="بني سويف"></option>
+          <option value="المنيا"></option>
+          <option value="أسيوط"></option>
+          <option value="سوهاج"></option>
+          <option value="قنا"></option>
+          <option value="الأقصر"></option>
+          <option value="أسوان"></option>
+          <option value="الوادي الجديد"></option>
+          <option value="مطروح"></option>
+        </datalist>
+
+      </div>
+
+
+      <!-- City -->
+      <div class="col-6">
+
+        <label class="form-label" for="city">
+          المدينة
+        </label>
+
+        <input
+          id="city"
+          list="cities"
+          class="form-control"
+          formControlName="city"
+          placeholder="اختر المدينة"
+          [disabled]="cities.length === 0"
+          [class.is-invalid]="
+            form.controls['city'].invalid &&
+            form.controls['city'].touched
+          "
+        >
+
+        <div class="invalid-feedback">
+          المدينة مطلوبة
+        </div>
+
+        <datalist id="cities">
+          @for (city of cities; track city) {
+            <option [value]="city"></option>
+          }
+        </datalist>
+
+      </div>
+
+    </div>
+
+
+    <!-- Buttons -->
+    <div class="d-flex gap-2 mt-4">
+
+      <button
+        type="submit"
+        class="btn btn-primary flex-grow-1"
+        [disabled]="saving"
+      >
+
+        @if (saving) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+
+        {{ editingId ? 'حفظ التعديل' : 'إضافة العنوان' }}
+
+      </button>
+
+      @if (editingId) {
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="cancelEdit()"
+        >
+          إلغاء
+        </button>
+
+      }
+
+    </div>
+
+  </form>
+
+</div>
+
   </div>
 
   <!-- List -->
+
   <div class="col-lg-7">
-    @if (loading) {
-      <div class="skeleton mb-2" style="height: 78px; border-radius: 14px"></div>
-      <div class="skeleton mb-2" style="height: 78px; border-radius: 14px"></div>
-    } @else if (addresses.length === 0) {
-      <div class="empty-state surface">
-        <i class="bi bi-geo-alt"></i>
-        <h5>لا توجد عناوين محفوظة</h5>
-        <p class="mb-0">أضف عنوانك الأول من النموذج.</p>
-      </div>
-    } @else {
-      <div class="d-grid gap-2">
-        @for (a of addresses; track a.id) {
-          <div class="surface addr-item" [class.is-editing]="editingId === a.id">
-            <div class="addr-item__icon"><i class="bi bi-geo-alt-fill"></i></div>
-            <div class="flex-grow-1 min-w-0">
-              <div class="fw-semibold">{{ a.street }}</div>
-              <div class="text-muted small">{{ a.city }}، {{ a.government }}</div>
-            </div>
-            <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-outline-primary" aria-label="تعديل" (click)="edit(a)">
-                <i class="bi bi-pencil"></i><span class="d-none d-sm-inline ms-1">تعديل</span>
-              </button>
-              <button type="button" class="btn btn-sm btn-outline-danger" aria-label="حذف" (click)="remove(a)">
-                <i class="bi bi-trash"></i><span class="d-none d-sm-inline ms-1">حذف</span>
-              </button>
-            </div>
-          </div>
-        }
-      </div>
-    }
+
+@if (loading) {
+
+  <div
+    class="skeleton mb-2"
+    style="height: 78px; border-radius: 14px"
+  ></div>
+
+  <div
+    class="skeleton mb-2"
+    style="height: 78px; border-radius: 14px"
+  ></div>
+
+}
+
+@else if (addresses.length === 0) {
+
+  <div class="empty-state surface">
+
+    <i class="bi bi-geo-alt"></i>
+
+    <h5>
+      لا توجد عناوين محفوظة
+    </h5>
+
+    <p class="mb-0">
+      أضف عنوانك الأول من النموذج.
+    </p>
+
   </div>
+
+}
+
+@else {
+
+  <div class="d-grid gap-2">
+
+    @for (a of addresses; track a.id) {
+
+      <div
+        class="surface addr-item"
+        [class.is-editing]="editingId === a.id"
+      >
+
+        <div class="addr-item__icon">
+          <i class="bi bi-geo-alt-fill"></i>
+        </div>
+
+        <div class="flex-grow-1 min-w-0">
+
+          <div class="fw-semibold">
+            {{ a.street }}
+          </div>
+
+          <div class="text-muted small">
+            {{ a.city }}، {{ a.government }}
+          </div>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            aria-label="تعديل"
+            (click)="edit(a)"
+          >
+            <i class="bi bi-pencil"></i>
+            <span class="d-none d-sm-inline ms-1">
+              تعديل
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger"
+            aria-label="حذف"
+            (click)="remove(a)"
+          >
+            <i class="bi bi-trash"></i>
+            <span class="d-none d-sm-inline ms-1">
+              حذف
+            </span>
+          </button>
+
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+}
+
+  </div>
+
 </div>
