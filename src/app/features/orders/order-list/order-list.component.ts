@@ -19,7 +19,7 @@ export class OrderListComponent implements OnInit {
   private confirmService = inject(ConfirmService);
 
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 5;
 
   orders$ = this.store.select(selectAllOrders);
   loading$ = this.store.select(selectOrdersLoading);
