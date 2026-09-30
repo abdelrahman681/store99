@@ -49,7 +49,7 @@ export class AddressListComponent implements OnInit {
 
   edit(a: AddressDTO): void {
     this.editingId = a.id ?? null;
-    this.form.patchValue({ city: a.city, street: a.street, country: a.country });
+    this.form.patchValue({ city: a.city, street: a.street, country: a.government });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -74,7 +74,7 @@ export class AddressListComponent implements OnInit {
       id: this.editingId ?? undefined,
       city: this.form.controls['city'].value,
       street: this.form.controls['street'].value,
-      country: this.form.controls['country'].value
+      government: this.form.controls['government'].value
     };
 
     this.saving = true;

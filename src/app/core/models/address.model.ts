@@ -3,11 +3,11 @@ export interface ShippingAddress {
   lName: string;
   city: string;
   street: string;
-  country: string;
+  government: string;
 }
 export interface AddressDTO {
   id?: number;
   city: string;
   street: string;
-  country: string;
+  government: string;
 }

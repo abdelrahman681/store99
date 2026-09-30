@@ -519,7 +519,7 @@ if (this.form.controls.country.invalid) {
   this.form.controls.country.markAsTouched();
 
   this.toastService.show(
-    'من فضلك أدخل الدولة',
+    'من فضلك أدخل المحافظة',
     'error'
   );
 
@@ -582,7 +582,7 @@ if (this.form.controls.deliveryMethodId.invalid) {
               city:
                 v.city,
 
-              country:
+              government:
                 v.country
 
             }
@@ -707,7 +707,7 @@ if (this.form.controls.deliveryMethodId.invalid) {
                 city:
                   v.city,
 
-                country:
+                government:
                   v.country
 
               }
@@ -828,7 +828,7 @@ if (this.form.controls.deliveryMethodId.invalid) {
         address.city,
 
       country:
-        address.country
+        address.government
 
     });
 
