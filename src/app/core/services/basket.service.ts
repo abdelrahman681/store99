@@ -22,12 +22,6 @@ export class BasketService {
     );
   }
 
-  deleteBasket(): Observable<boolean> {
-    return this.http.delete<boolean>(
-      `${this.baseUrl}/DeleteBasket`
-    );
-  }
-
   getDeliveryMethods(): Observable<any> {
     return this.http.get(
       `${this.baseUrl}/GetDeliveryMethodName`
