@@ -65,16 +65,16 @@
         </div>
 
         <!-- Date of birth -->
-        <div class="col-12 col-md-6 required-field">
-          <label class="form-label" for="dob">تاريخ الميلاد</label>
+        <div class="col-12 col-md-6 ">
+          <label class="form-label required-field" for="dob">تاريخ الميلاد</label>
           <input id="dob" type="date" class="form-control" formControlName="DOB"
                  [class.is-invalid]="form.get('DOB')?.invalid && form.get('DOB')?.touched">
           <div class="invalid-feedback">تاريخ الميلاد مطلوب</div>
         </div>
 
         <!-- Gender -->
-        <div class="col-12 col-md-6 required-field">
-          <label class="form-label" for="gender">النوع</label>
+        <div class="col-12 col-md-6 ">
+          <label class="form-label required-field" for="gender">النوع</label>
           <select id="gender" class="form-select" formControlName="Gender">
             <option value="Male">ذكر</option>
             <option value="Female">أنثى</option>
