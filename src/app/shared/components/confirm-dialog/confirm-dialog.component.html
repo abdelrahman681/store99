@@ -1,0 +1,26 @@
+@if (state$ | async; as s) {
+  <div class="confirm-backdrop" (click)="answer(false)">
+    <div
+      class="confirm-box confirm-box--{{ s.tone }}"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="confirm-title"
+      (click)="$event.stopPropagation()">
+      <div class="confirm-box__icon"><i class="bi" [ngClass]="s.icon"></i></div>
+      <h5 id="confirm-title">{{ s.title }}</h5>
+      <p>{{ s.message }}</p>
+      <div class="confirm-box__actions">
+        <button type="button" class="btn btn-outline-secondary" (click)="answer(false)">{{ s.cancelText }}</button>
+        <button
+          #confirmBtn
+          type="button"
+          class="btn"
+          [class.btn-danger]="s.tone === 'danger'"
+          [class.btn-primary]="s.tone !== 'danger'"
+          (click)="answer(true)">
+          {{ s.confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

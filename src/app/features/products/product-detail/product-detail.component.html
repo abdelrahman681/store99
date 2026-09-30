@@ -1,0 +1,115 @@
+<a routerLink="/products" class="back-link mb-3">
+  <i class="bi bi-arrow-right"></i> رجوع للمنتجات
+</a>
+
+@if (loading) {
+  <div class="row g-3 g-lg-4" aria-busy="true">
+    <div class="col-lg-5"><div class="skeleton w-100" style="aspect-ratio: 1 / 1; border-radius: 16px"></div></div>
+    <div class="col-lg-7">
+      <div class="surface p-4">
+        <div class="skeleton" style="height: 28px; width: 70%"></div>
+        <div class="skeleton mt-3" style="height: 16px; width: 35%"></div>
+        <div class="skeleton mt-4" style="height: 34px; width: 30%"></div>
+        <div class="skeleton mt-4" style="height: 90px"></div>
+        <div class="skeleton mt-4" style="height: 46px"></div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (product$ | async; as p) {
+  <div class="row g-3 g-lg-4">
+
+    <!-- Image -->
+    <div class="col-lg-5">
+      <div class="surface detail-media">
+        <img [src]="p.pictureUrl" [alt]="p.name">
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="col-lg-7">
+      <div class="surface p-3 p-md-4">
+
+        <h1 class="h3 fw-bold mb-2">{{ p.name }}</h1>
+
+        <div class="d-flex flex-wrap align-items-center gap-2 text-muted mb-3">
+          @if (p.brandName) { <span class="chip">{{ p.brandName }}</span> }
+          @if (p.categoryName) { <span class="chip">{{ p.categoryName }}</span> }
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+          <span class="badge bg-warning text-dark"><i class="fa-solid fa-star me-1"></i>{{ p.averageRating | number:'1.1-1' }}</span>
+          <span class="text-muted small">({{ p.reviewsCount }} تقييم)</span>
+        </div>
+
+        <div class="detail-price mb-3">
+          <span class="price">{{ p.price | number:'1.0-2' }}</span> <small class="text-muted">ج.م</small>
+        </div>
+
+        @if (p.description) {
+          <div class="mb-4">
+            <h6 class="fw-bold">الوصف</h6>
+            <p class="text-muted mb-0" style="line-height: 1.9">{{ p.description }}</p>
+          </div>
+        }
+
+        <!-- Stock -->
+        <div class="mb-3">
+          @if (p.stockQuantity > 0) {
+            <span class="status-badge status-badge--success"><i class="fa-solid fa-circle-check me-1"></i>متوفر</span>
+            <span class="text-muted small ms-2">المتاح: {{ p.stockQuantity }} قطعة</span>
+          } @else {
+            <span class="status-badge status-badge--danger"><i class="fa-solid fa-circle-xmark me-1"></i>غير متوفر</span>
+          }
+        </div>
+
+        <!-- Quantity -->
+        @if (p.stockQuantity > 0 && !isAtStockLimit(p)) {
+          <div class="mb-4">
+            <label class="form-label d-block">الكمية</label>
+            <div class="qty-stepper">
+              <button type="button" aria-label="نقص" [disabled]="quantity <= 1" (click)="changeQuantity(-1, p)">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <input type="number" inputmode="numeric" min="1" [max]="remaining(p)" [(ngModel)]="quantity" aria-label="الكمية">
+              <button type="button" aria-label="زيادة" [disabled]="quantity >= remaining(p)" (click)="changeQuantity(1, p)">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Actions -->
+        <div class="d-grid d-sm-flex gap-2">
+          <button
+            type="button"
+            class="btn btn-lg flex-sm-grow-1"
+            [class.btn-primary]="p.stockQuantity > 0 && !isAtStockLimit(p)"
+            [class.btn-secondary]="p.stockQuantity === 0 || isAtStockLimit(p)"
+            [disabled]="p.stockQuantity === 0 || isAtStockLimit(p)"
+            (click)="addToBasket(p)">
+            @if (p.stockQuantity === 0) {
+              غير متوفر
+            } @else if (isAtStockLimit(p)) {
+              وصلت للحد الأقصى
+            } @else {
+              <i class="fa-solid fa-cart-shopping me-2"></i>إضافة للسلة
+            }
+          </button>
+
+          <button type="button" class="btn btn-lg btn-outline-danger" (click)="addToWishlist(p)">
+            <i class="fa-solid fa-heart me-2"></i>المفضلة
+          </button>
+        </div>
+
+        @if (p.stockQuantity > 0 && isAtStockLimit(p)) {
+          <div class="alert alert-warning mt-3 mb-0">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+            لقد وصلت إلى أقصى كمية متاحة من هذا المنتج.
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

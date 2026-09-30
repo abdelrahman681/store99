@@ -1,0 +1,17 @@
+<div class="toast-stack" aria-live="polite">
+  @for (toast of (toasts$ | async) ?? []; track toast.id) {
+    <div
+      class="app-toast app-toast--{{ toast.type }}"
+      [class.is-leaving]="toast.leaving"
+      [style.--toast-duration]="toast.duration + 'ms'"
+      [attr.role]="toast.type === 'error' ? 'alert' : 'status'"
+      (click)="dismiss(toast.id)">
+      <span class="app-toast__icon"><i class="bi" [ngClass]="icon(toast.type)"></i></span>
+      <span class="app-toast__text">{{ toast.text }}</span>
+      <button type="button" class="app-toast__close" aria-label="إغلاق" (click)="dismiss(toast.id); $event.stopPropagation()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <span class="app-toast__bar"></span>
+    </div>
+  }
+</div>

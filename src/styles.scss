@@ -1,0 +1,6 @@
+// Store99 — global styles (Bootstrap RTL is loaded before this file via angular.json)
+@use 'styles/base';
+@use 'styles/components';
+@use 'styles/layout';
+@use 'styles/toast';
+@use 'styles/pages';

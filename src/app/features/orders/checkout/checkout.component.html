@@ -1,0 +1,715 @@
+<style>
+  .address-card {
+    border: 2px solid #dee2e6;
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.2s ease;
+  }
+
+  .address-card:hover {
+    border-color: #adb5bd;
+    background-color: #f8f9fa;
+  }
+
+  .address-card.selected {
+    border-color: #0d6efd;
+    background-color: #f0f6ff;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.1);
+  }
+</style>
+
+<div>
+
+  <div class="page-head">
+    <h1 class="page-title"><i class="bi bi-bag-check"></i> إتمام الطلب</h1>
+  </div>
+
+  <!-- Loading -->
+  <div
+    *ngIf="loading$ | async"
+    class="spinner-wrap">
+
+    <div class="spinner-border text-primary"></div>
+
+  </div>
+
+
+  <form
+    *ngIf="basket$ | async as basket"
+    [formGroup]="form"
+    (ngSubmit)="confirmAndPay(basket.id)">
+
+    <div class="row g-4">
+
+      <!-- ================= LEFT SIDE ================= -->
+      <div class="col-lg-8">
+
+
+        <!-- ================= ADDRESS ================= -->
+        <div class="card shadow-sm mb-4">
+
+          <div class="card-body">
+
+            <h5 class="card-title mb-3">
+              <i class="bi bi-geo-alt me-1"></i>
+              عنوان الشحن
+            </h5>
+
+
+            <!-- ================= SAVED ADDRESSES ================= -->
+            <div
+              *ngIf="savedAddresses.length > 0"
+              class="mb-4">
+
+              <label class="form-label fw-bold">
+                العناوين المحفوظة
+              </label>
+
+
+              <div class="row g-3">
+
+                <div
+                  class="col-md-6"
+                  *ngFor="let address of savedAddresses">
+
+                  <button
+                    type="button"
+                    class="address-card w-100 text-start"
+                    [class.selected]="
+                      form.controls.addressId.value === address.id
+                    "
+                    (click)="useAddress(address)">
+
+                    <div
+                      class="d-flex justify-content-between align-items-start">
+
+                      <div>
+
+                        <div class="fw-bold mb-1">
+                          العنوان {{ address.id }}
+                        </div>
+
+                        <small class="text-muted">
+                          {{ address.street }},
+                          {{ address.city }},
+                          {{ address.country }}
+                        </small>
+
+                      </div>
+
+
+                      <i
+                        *ngIf="
+                          form.controls.addressId.value === address.id
+                        "
+                        class="bi bi-check-circle-fill text-primary fs-4">
+                      </i>
+
+                    </div>
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- ================= ADDRESS FORM ================= -->
+            <div class="row g-3">
+
+
+              <!-- First Name -->
+              <div class="col-md-6">
+
+                <label class="form-label">
+                  الاسم الأول
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="fName">
+
+                <div
+                  class="text-danger small mt-1"
+                  *ngIf="
+                    form.controls.fName.touched &&
+                    form.controls.fName.invalid
+                  ">
+
+                  الاسم الأول مطلوب
+
+                </div>
+
+              </div>
+
+
+              <!-- Last Name -->
+              <div class="col-md-6">
+
+                <label class="form-label">
+                  الاسم الأخير
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="lName">
+
+                <div
+                  class="text-danger small mt-1"
+                  *ngIf="
+                    form.controls.lName.touched &&
+                    form.controls.lName.invalid
+                  ">
+
+                  الاسم الأخير مطلوب
+
+                </div>
+
+              </div>
+
+
+              <!-- Street -->
+              <div class="col-12">
+
+                <label class="form-label">
+                  الشارع
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="street">
+
+                <div
+                  class="text-danger small mt-1"
+                  *ngIf="
+                    form.controls.street.touched &&
+                    form.controls.street.invalid
+                  ">
+
+                  العنوان مطلوب
+
+                </div>
+
+              </div>
+
+
+              <!-- City -->
+              <div class="col-md-6">
+
+                <label class="form-label">
+                  المدينة
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="city">
+
+                <div
+                  class="text-danger small mt-1"
+                  *ngIf="
+                    form.controls.city.touched &&
+                    form.controls.city.invalid
+                  ">
+
+                  المدينة مطلوبة
+
+                </div>
+
+              </div>
+
+
+              <!-- Country -->
+              <div class="col-md-6">
+
+                <label class="form-label">
+                  الدولة
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="country">
+
+                <div
+                  class="text-danger small mt-1"
+                  *ngIf="
+                    form.controls.country.touched &&
+                    form.controls.country.invalid
+                  ">
+
+                  الدولة مطلوبة
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================= DELIVERY ================= -->
+        <div class="card shadow-sm mb-4">
+
+          <div class="card-body">
+
+            <h5 class="card-title mb-3">
+              <i class="bi bi-truck me-1"></i>
+              طريقة الشحن
+            </h5>
+
+
+            <!-- Loading Delivery Methods -->
+            <div
+              *ngIf="loadingDeliveryMethods"
+              class="text-center py-3">
+
+              <div class="spinner-border text-primary"></div>
+
+            </div>
+
+
+            <!-- Delivery Methods -->
+            <div
+              class="row g-3"
+              *ngIf="!loadingDeliveryMethods">
+
+              <div
+                class="col-md-6"
+                *ngFor="let method of deliveryMethods">
+
+                <button
+                  type="button"
+                  class="btn w-100 text-start"
+                  [class.btn-primary]="
+                    selectedDeliveryMethod?.id === method.id
+                  "
+                  [class.btn-outline-secondary]="
+                    selectedDeliveryMethod?.id !== method.id
+                  "
+                  (click)="selectDeliveryMethod(method)">
+
+                  <div
+                    class="d-flex justify-content-between">
+
+                    <span>
+                      {{ method.shortName }}
+                    </span>
+
+                    <strong>
+                      {{ method.cost | number:'1.0-2' }}
+                      ج.م
+                    </strong>
+
+                  </div>
+
+                  <small>
+                    {{ method.deliveryTime }}
+                  </small>
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <!-- Delivery Validation -->
+            <div
+              class="text-danger small mt-2"
+              *ngIf="
+                form.controls.deliveryMethodId.touched &&
+                form.controls.deliveryMethodId.invalid
+              ">
+
+              اختر طريقة الشحن
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================= PAYMENT METHOD ================= -->
+        <div class="card shadow-sm mb-4">
+
+          <div class="card-body">
+
+            <h5 class="card-title mb-3">
+              <i class="bi bi-wallet2 me-1"></i>
+              طريقة الدفع
+            </h5>
+
+
+            <div class="row g-3">
+
+
+              <!-- CARD PAYMENT -->
+              <div class="col-md-6">
+
+                <button
+                  type="button"
+                  class="btn w-100 text-start p-3"
+                  [class.btn-primary]="
+                    form.controls.paymentMethod.value === 'card'
+                  "
+                  [class.btn-outline-secondary]="
+                    form.controls.paymentMethod.value !== 'card'
+                  "
+                  (click)="selectPaymentMethod('card')">
+
+                  <div class="d-flex align-items-center">
+
+                    <i class="bi bi-credit-card fs-3 me-3"></i>
+
+                    <div>
+
+                      <strong>
+                        الدفع بالبطاقة
+                      </strong>
+
+                      <br>
+
+                      <small>
+                        Visa / Mastercard
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                </button>
+
+              </div>
+
+
+              <!-- CASH ON DELIVERY -->
+              <div class="col-md-6">
+
+                <button
+                  type="button"
+                  class="btn w-100 text-start p-3"
+                  [class.btn-primary]="
+                    form.controls.paymentMethod.value === 'cod'
+                  "
+                  [class.btn-outline-secondary]="
+                    form.controls.paymentMethod.value !== 'cod'
+                  "
+                  (click)="selectPaymentMethod('cod')">
+
+                  <div class="d-flex align-items-center">
+
+                    <i class="bi bi-cash-stack fs-3 me-3"></i>
+
+                    <div>
+
+                      <strong>
+                        الدفع عند الاستلام
+                      </strong>
+
+                      <br>
+
+                      <small>
+                        ادفع نقدًا عند استلام الطلب
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================= STRIPE ================= -->
+        <div
+          class="card shadow-sm mb-4"
+          *ngIf="
+            form.controls.paymentMethod.value === 'card'
+          ">
+
+          <div class="card-body">
+
+            <h5 class="card-title mb-3">
+              بيانات البطاقة
+            </h5>
+
+
+            <!-- Preparing Stripe -->
+            <div
+              *ngIf="preparingPayment"
+              class="text-center py-3">
+
+              <div
+                class="spinner-border text-primary">
+              </div>
+
+              <p class="text-muted mt-2 mb-0">
+                جاري تجهيز الدفع...
+              </p>
+
+            </div>
+
+
+            <!-- Stripe Error -->
+            <div
+              *ngIf="paymentError"
+              class="alert alert-danger">
+
+              {{ paymentError }}
+
+            </div>
+
+
+            <!-- Stripe Element -->
+            <div
+              *ngIf="
+                !preparingPayment &&
+                !paymentError
+              "
+              id="card-element"
+              class="border rounded p-3">
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================= COD MESSAGE ================= -->
+        <div
+          class="alert alert-info"
+          *ngIf="
+            form.controls.paymentMethod.value === 'cod'
+          ">
+
+          <i class="bi bi-info-circle me-1"></i>
+
+          سيتم دفع قيمة الطلب نقدًا عند استلامه.
+
+        </div>
+
+
+
+
+        <!-- ================= SUBMIT ================= -->
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg w-100"
+          [disabled]="
+            processingPayment ||
+            (loading$ | async)
+          ">
+
+          <!-- Loading -->
+          <span
+            *ngIf="processingPayment"
+            class="spinner-border spinner-border-sm me-2">
+          </span>
+
+
+          <!-- Card -->
+          <span
+            *ngIf="
+              !processingPayment &&
+              form.controls.paymentMethod.value === 'card'
+            ">
+
+            <i class="bi bi-lock-fill me-1"></i>
+
+            دفع وإتمام الطلب
+
+          </span>
+
+
+          <!-- COD -->
+          <span
+            *ngIf="
+              !processingPayment &&
+              form.controls.paymentMethod.value === 'cod'
+            ">
+
+            <i class="bi bi-bag-check me-1"></i>
+
+            تأكيد الطلب والدفع عند الاستلام
+
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- ================= RIGHT SIDE ================= -->
+      <div class="col-lg-4">
+
+        <div
+          class="card shadow-sm sticky-lg-top"
+          style="top: 90px;">
+
+          <div class="card-body">
+
+            <h5 class="card-title mb-3">
+              ملخص الطلب
+            </h5>
+
+
+            <!-- ================= BASKET ITEMS ================= -->
+            <div
+              *ngIf="items$ | async as items">
+
+              <div
+                *ngFor="let item of items"
+                class="d-flex justify-content-between align-items-center mb-3">
+
+
+                <!-- Product -->
+                <div
+                  class="d-flex align-items-center gap-2">
+
+                  <img
+                    [src]="item.pictureUrl"
+                    [alt]="item.name"
+                    width="50"
+                    height="50"
+                    class="rounded"
+                    style="object-fit: cover;">
+
+
+                  <div>
+
+                    <div class="fw-semibold">
+                      {{ item.name }}
+                    </div>
+
+                    <small class="text-muted">
+
+                      {{ item.quantity }}
+                      ×
+                      {{ item.price | number:'1.0-2' }}
+                      ج.م
+
+                    </small>
+
+                  </div>
+
+                </div>
+
+
+                <!-- Item Total -->
+                <span class="fw-semibold">
+
+                  {{
+                    item.quantity * item.price
+                    | number:'1.0-2'
+                  }}
+
+                  ج.م
+
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <hr>
+
+
+            <!-- ================= SUBTOTAL ================= -->
+            <div
+              class="d-flex justify-content-between mb-2">
+
+              <span>
+                الإجمالي الفرعي
+              </span>
+
+              <span>
+
+                {{
+                  subTotal$ | async
+                  | number:'1.0-2'
+                }}
+
+                ج.م
+
+              </span>
+
+            </div>
+
+
+            <!-- ================= SHIPPING ================= -->
+            <div
+              class="d-flex justify-content-between mb-2">
+
+              <span>
+                الشحن
+              </span>
+
+              <span>
+
+                {{
+                  shippingCost$ | async
+                  | number:'1.0-2'
+                }}
+
+                ج.م
+
+              </span>
+
+            </div>
+
+
+            <hr>
+
+
+            <!-- ================= TOTAL ================= -->
+            <div
+              class="d-flex justify-content-between fw-bold fs-5">
+
+              <span>
+                الإجمالي
+              </span>
+
+              <span>
+
+                {{
+                  total$ | async
+                  | number:'1.0-2'
+                }}
+
+                ج.م
+
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </form>
+
+</div>

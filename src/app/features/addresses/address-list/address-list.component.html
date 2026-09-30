@@ -1,0 +1,81 @@
+<div class="page-head">
+  <h1 class="page-title"><i class="fa-solid fa-location-dot"></i> عناويني</h1>
+</div>
+
+<div class="row g-3 g-lg-4">
+
+  <!-- Form -->
+  <div class="col-lg-5">
+    <div class="surface p-3 p-md-4 summary-card">
+      <h5 class="mb-3">{{ editingId ? 'تعديل العنوان' : 'إضافة عنوان جديد' }}</h5>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="street">الشارع</label>
+          <input id="street" class="form-control" formControlName="street" placeholder="اسم الشارع ورقم المبنى"
+                 [class.is-invalid]="form.controls['street'].invalid && form.controls['street'].touched">
+          <div class="invalid-feedback">الشارع مطلوب</div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label" for="city">المدينة</label>
+            <input id="city" class="form-control" formControlName="city"
+                   [class.is-invalid]="form.controls['city'].invalid && form.controls['city'].touched">
+            <div class="invalid-feedback">المدينة مطلوبة</div>
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="country">الدولة</label>
+            <input id="country" class="form-control" formControlName="country"
+                   [class.is-invalid]="form.controls['country'].invalid && form.controls['country'].touched">
+            <div class="invalid-feedback">الدولة مطلوبة</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-primary flex-grow-1" [disabled]="saving">
+            @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
+            {{ editingId ? 'حفظ التعديل' : 'إضافة العنوان' }}
+          </button>
+          @if (editingId) {
+            <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">إلغاء</button>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="col-lg-7">
+    @if (loading) {
+      <div class="skeleton mb-2" style="height: 78px; border-radius: 14px"></div>
+      <div class="skeleton mb-2" style="height: 78px; border-radius: 14px"></div>
+    } @else if (addresses.length === 0) {
+      <div class="empty-state surface">
+        <i class="bi bi-geo-alt"></i>
+        <h5>لا توجد عناوين محفوظة</h5>
+        <p class="mb-0">أضف عنوانك الأول من النموذج.</p>
+      </div>
+    } @else {
+      <div class="d-grid gap-2">
+        @for (a of addresses; track a.id) {
+          <div class="surface addr-item" [class.is-editing]="editingId === a.id">
+            <div class="addr-item__icon"><i class="bi bi-geo-alt-fill"></i></div>
+            <div class="flex-grow-1 min-w-0">
+              <div class="fw-semibold">{{ a.street }}</div>
+              <div class="text-muted small">{{ a.city }}، {{ a.country }}</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-outline-primary" aria-label="تعديل" (click)="edit(a)">
+                <i class="bi bi-pencil"></i><span class="d-none d-sm-inline ms-1">تعديل</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger" aria-label="حذف" (click)="remove(a)">
+                <i class="bi bi-trash"></i><span class="d-none d-sm-inline ms-1">حذف</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,67 @@
+<div class="page-head">
+  <h1 class="page-title"><i class="fa-solid fa-heart"></i> المفضلة</h1>
+  @if (!loading && wishlist.length > 0) {
+    <span class="badge bg-danger">{{ wishlist.length }} منتج</span>
+  }
+</div>
+
+@if (loading) {
+  <div class="row g-2 g-md-3" aria-busy="true">
+    @for (s of skeletons; track $index) {
+      <div class="col-6 col-lg-4">
+        <div class="product-card">
+          <div class="product-card__media"><div class="skeleton w-100 h-100"></div></div>
+          <div class="product-card__body">
+            <div class="skeleton" style="height: 16px; width: 80%"></div>
+            <div class="skeleton mt-2" style="height: 18px; width: 40%"></div>
+            <div class="skeleton mt-3" style="height: 40px"></div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+} @else if (loadFailed) {
+  <div class="empty-state surface">
+    <i class="bi bi-wifi-off"></i>
+    <h5>تعذر تحميل المفضلة</h5>
+    <p class="mb-3">تأكد من تسجيل الدخول واتصالك بالإنترنت.</p>
+    <button type="button" class="btn btn-primary" (click)="loadWishlist()">إعادة المحاولة</button>
+  </div>
+} @else if (wishlist.length === 0) {
+  <div class="empty-state surface">
+    <i class="bi bi-heart"></i>
+    <h5>قائمة المفضلة فاضية</h5>
+    <p class="mb-3">أضف المنتجات اللي بتعجبك هنا.</p>
+    <a routerLink="/products" class="btn btn-primary">تصفح المنتجات</a>
+  </div>
+} @else {
+  <div class="row g-2 g-md-3">
+    @for (item of wishlist; track item.productId) {
+      <div class="col-6 col-lg-4">
+        <article class="product-card">
+          <a class="product-card__media" [routerLink]="['/products', item.product.id]" [attr.aria-label]="item.product.name">
+            <img [src]="item.product.pictureUrl" [alt]="item.product.name" loading="lazy">
+          </a>
+
+          <div class="product-card__body">
+            <a class="product-card__title" [routerLink]="['/products', item.product.id]">{{ item.product.name }}</a>
+
+            <div class="product-card__price">
+              <span class="price">{{ item.product.price | number:'1.0-2' }}</span>
+              <small class="text-muted">ج.م</small>
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
+              <a [routerLink]="['/products', item.product.id]" class="btn btn-primary flex-grow-1">عرض المنتج</a>
+              <button type="button" class="btn btn-outline-danger" aria-label="حذف من المفضلة" (click)="remove(item.productId)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    }
+  </div>
+
+  <app-pagination [pageIndex]="pageIndex" [totalPages]="totalPages" (pageChange)="onPageChange($event)"></app-pagination>
+}

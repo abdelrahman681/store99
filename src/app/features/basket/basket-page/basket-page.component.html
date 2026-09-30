@@ -1,0 +1,71 @@
+<div class="page-head">
+  <h1 class="page-title"><i class="bi bi-cart3"></i> سلة المشتريات</h1>
+</div>
+
+@if (items$ | async; as items) {
+
+  @if (items.length === 0) {
+    <div class="empty-state surface">
+      <i class="bi bi-cart-x"></i>
+      <h5>السلة فارغة</h5>
+      <p class="mb-3">ابدأ بإضافة منتجات تعجبك.</p>
+      <a routerLink="/products" class="btn btn-primary">تصفح المنتجات</a>
+    </div>
+  } @else {
+
+    <div class="row g-3 g-lg-4">
+      <!-- Items -->
+      <div class="col-lg-8">
+        <div class="surface basket-list">
+          @for (item of items; track item.productId) {
+            <div class="basket-item">
+              <a [routerLink]="['/products', item.productId]" class="basket-item__img">
+                <img [src]="item.pictureUrl" [alt]="item.name">
+              </a>
+
+              <div class="basket-item__info">
+                <a [routerLink]="['/products', item.productId]" class="basket-item__name">{{ item.name }}</a>
+                <div class="text-muted small">{{ item.price | number:'1.0-2' }} ج.م للقطعة</div>
+
+                <div class="basket-item__row">
+                  <div class="qty-stepper">
+                    <button type="button" aria-label="نقص" (click)="decrement(item.productId)"><i class="fa-solid fa-minus"></i></button>
+                    <span>{{ item.quantity }}</span>
+                    <button type="button" aria-label="زيادة" (click)="increment(item)"><i class="fa-solid fa-plus"></i></button>
+                  </div>
+
+                  <strong class="basket-item__total">{{ item.price * item.quantity | number:'1.0-2' }} <small>ج.م</small></strong>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-sm btn-outline-danger basket-item__remove" aria-label="حذف" (click)="remove(item)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          }
+        </div>
+
+        <a routerLink="/products" class="back-link mt-3"><i class="bi bi-arrow-right"></i> متابعة التسوق</a>
+      </div>
+
+      <!-- Summary -->
+      <div class="col-lg-4">
+        <div class="surface p-3 p-md-4 summary-card">
+          <h5 class="mb-3">ملخص الطلب</h5>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">عدد المنتجات</span>
+            <span>{{ items.length }}</span>
+          </div>
+          <div class="d-flex justify-content-between fs-5 fw-bold pt-2 border-top">
+            <span>الإجمالي الفرعي</span>
+            <span class="price">{{ subTotal$ | async | number:'1.0-2' }} ج.م</span>
+          </div>
+          <p class="text-muted small mt-2 mb-3">مصاريف الشحن تُضاف في الخطوة التالية.</p>
+          <button type="button" class="btn btn-primary btn-lg w-100" (click)="checkout()">
+            إتمام الشراء <i class="bi bi-arrow-left ms-1"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}

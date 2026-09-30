@@ -1,0 +1,62 @@
+<a routerLink="/orders" class="back-link mb-3"><i class="bi bi-arrow-right"></i> رجوع للطلبات</a>
+
+@if (loading$ | async) {
+  <div class="row g-3" aria-busy="true">
+    <div class="col-md-7"><div class="skeleton" style="height: 240px; border-radius: 14px"></div></div>
+    <div class="col-md-5"><div class="skeleton" style="height: 240px; border-radius: 14px"></div></div>
+  </div>
+}
+
+@if (order$ | async; as order) {
+  <div class="page-head">
+    <h1 class="page-title"><i class="fa-solid fa-receipt"></i> تفاصيل الطلب #{{ order.id }}</h1>
+    <span [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
+  </div>
+
+  <div class="row g-3 g-lg-4">
+
+    <!-- Products -->
+    <div class="col-md-7">
+      <div class="surface p-3 p-md-4">
+        <h6 class="fw-bold mb-3">المنتجات</h6>
+        <div class="order-items">
+          @for (item of order.items; track item.productId) {
+            <div class="order-item">
+              <img [src]="item.pictureUrl" [alt]="item.productName" width="60" height="60">
+              <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold">{{ item.productName }}</div>
+                <div class="text-muted small">{{ item.price | number:'1.0-2' }} ج.م × {{ item.quantity }}</div>
+              </div>
+              <strong class="text-nowrap">{{ item.price * item.quantity | number:'1.0-2' }} ج.م</strong>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="col-md-5">
+      <div class="surface p-3 p-md-4 mb-3">
+        <h6 class="fw-bold mb-2"><i class="bi bi-geo-alt me-1 text-primary"></i> عنوان الشحن</h6>
+        <p class="mb-0 fw-semibold">{{ order.address.fName }} {{ order.address.lName }}</p>
+        <p class="mb-0 text-muted">{{ order.address.street }}، {{ order.address.city }} — {{ order.address.country }}</p>
+      </div>
+
+      <div class="surface p-3 p-md-4">
+        <h6 class="fw-bold mb-3"><i class="bi bi-receipt me-1 text-primary"></i> ملخص الطلب</h6>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">طريقة الشحن</span>
+          <span>{{ order.deliveryMethod }} ({{ order.deliveryMethodCost }})</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">الإجمالي الفرعي</span>
+          <span>{{ order.subTotal | number:'1.0-2' }} ج.م</span>
+        </div>
+        <div class="d-flex justify-content-between fs-5 fw-bold pt-2 border-top">
+          <span>الإجمالي</span>
+          <span class="price">{{ order.total | number:'1.0-2' }} ج.م</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

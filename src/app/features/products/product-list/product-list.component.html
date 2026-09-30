@@ -1,0 +1,159 @@
+<!-- Title -->
+<div class="page-head">
+  <h1 class="page-title"><i class="fa-solid fa-store"></i> المنتجات</h1>
+  @if (paging$ | async; as paging) {
+    @if (paging.totalCount > 0) {
+      <span class="text-muted small">{{ paging.totalCount }} منتج</span>
+    }
+  }
+</div>
+
+<!-- Filters -->
+<section class="filters-card mb-3">
+  <div class="row g-2">
+    <div class="col-12 col-lg-3">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          class="form-control"
+          type="search"
+          placeholder="ابحث عن منتج..."
+          aria-label="بحث"
+          [(ngModel)]="searchValue"
+          (ngModelChange)="onSearchChange()">
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <select class="form-select" aria-label="الماركة" [(ngModel)]="selectedBrandId" (change)="onFilterChange()">
+        <option [ngValue]="0">كل الماركات</option>
+        @for (b of (brands$ | async) ?? []; track b.id) {
+          <option [ngValue]="b.id">{{ b.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <select class="form-select" aria-label="الفئة" [(ngModel)]="selectedCategoryId" (change)="onFilterChange()">
+        <option [ngValue]="0">كل الفئات</option>
+        @for (c of (categories$ | async) ?? []; track c.id) {
+          <option [ngValue]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-12 col-md-4 col-lg-3">
+      <select class="form-select" aria-label="الترتيب" [(ngModel)]="sort" (change)="onFilterChange()">
+        <option value="">الترتيب: افتراضي</option>
+        <option value="PriceAsc">السعر: من الأقل</option>
+        <option value="PriceDesc">السعر: من الأعلى</option>
+        <option value="NameAsc">الاسم: أ - ي</option>
+        <option value="NameDesc">الاسم: ي - أ</option>
+      </select>
+    </div>
+  </div>
+
+  @if (hasFilters) {
+    <button type="button" class="btn btn-sm btn-link text-decoration-none px-0 mt-2" (click)="resetFilters()">
+      <i class="bi bi-x-circle me-1"></i> مسح الفلاتر
+    </button>
+  }
+</section>
+
+<!-- Products -->
+@if (loading$ | async) {
+
+  <div class="row g-2 g-md-3" aria-busy="true">
+    @for (s of skeletons; track $index) {
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="product-card">
+          <div class="product-card__media"><div class="skeleton w-100 h-100"></div></div>
+          <div class="product-card__body">
+            <div class="skeleton" style="height: 12px; width: 40%"></div>
+            <div class="skeleton mt-2" style="height: 16px; width: 90%"></div>
+            <div class="skeleton mt-2" style="height: 18px; width: 50%"></div>
+            <div class="skeleton mt-3" style="height: 40px"></div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+} @else {
+
+  @if ((products$ | async) ?? []; as products) {
+    @if (products.length === 0) {
+      <div class="empty-state">
+        <i class="bi bi-search"></i>
+        <h5>لا توجد منتجات مطابقة</h5>
+        <p class="mb-3">جرّب تغيير كلمة البحث أو الفلاتر.</p>
+        @if (hasFilters) {
+          <button type="button" class="btn btn-outline-primary" (click)="resetFilters()">مسح الفلاتر</button>
+        }
+      </div>
+    } @else {
+      <div class="row g-2 g-md-3">
+        @for (p of products; track p.id) {
+          <div class="col-6 col-md-4 col-lg-3">
+            <article class="product-card">
+
+              <a class="product-card__media" [routerLink]="['/products', p.id]" [attr.aria-label]="p.name">
+                <img [src]="p.pictureUrl" [alt]="p.name" loading="lazy">
+              </a>
+
+              @if (p.stockQuantity === 0) {
+                <span class="product-card__badge product-card__badge--out">غير متوفر</span>
+              }
+
+              <button
+                type="button"
+                class="product-card__wish"
+                aria-label="أضف للمفضلة"
+                title="أضف للمفضلة"
+                (click)="addToWishlist(p)">
+                <i class="bi bi-heart-fill"></i>
+              </button>
+
+              <div class="product-card__body">
+                @if (p.brandName) {
+                  <span class="product-card__brand">{{ p.brandName }}</span>
+                }
+                <a class="product-card__title" [routerLink]="['/products', p.id]">{{ p.name }}</a>
+
+                <div class="product-card__price">
+                  <span class="price">{{ p.price | number:'1.0-2' }}</span>
+                  <small class="text-muted">ج.م</small>
+                </div>
+
+                <button
+                  type="button"
+                  class="btn w-100 mt-2"
+                  [class.btn-primary]="p.stockQuantity > 0 && !isAtStockLimit(p)"
+                  [class.btn-secondary]="p.stockQuantity === 0 || isAtStockLimit(p)"
+                  [disabled]="p.stockQuantity === 0 || isAtStockLimit(p)"
+                  (click)="addToBasket(p)">
+                  @if (p.stockQuantity === 0) {
+                    غير متوفر حالياً
+                  } @else if (isAtStockLimit(p)) {
+                    وصلت للحد الأقصى
+                  } @else {
+                    <i class="fa-solid fa-cart-shopping me-1"></i> أضف للسلة
+                  }
+                </button>
+              </div>
+            </article>
+          </div>
+        }
+      </div>
+    }
+  }
+}
+
+<!-- Pagination -->
+@if (paging$ | async; as paging) {
+  <app-pagination
+    [pageIndex]="paging.pageIndex"
+    [totalPages]="paging.totalPages"
+    (pageChange)="load($event)">
+  </app-pagination>
+}

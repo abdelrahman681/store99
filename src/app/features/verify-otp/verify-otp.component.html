@@ -1,0 +1,31 @@
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-icon"><i class="fa-solid fa-shield-halved"></i></div>
+    <h1 class="auth-title">التحقق من الكود</h1>
+    <p class="auth-sub">اكتب الكود المكوّن من 6 أرقام المُرسل إلى<br><strong dir="ltr" class="text-break">{{ email }}</strong></p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="mb-3">
+        <input type="text" class="form-control otp-input" formControlName="otp" maxlength="6" inputmode="numeric"
+               autocomplete="one-time-code" placeholder="••••••" dir="ltr" aria-label="كود التحقق"
+               [class.is-invalid]="form.controls.otp.touched && form.controls.otp.invalid">
+        @if (form.controls.otp.touched && form.controls.otp.invalid) {
+          <div class="text-danger small mt-1 text-center">
+            @if (form.controls.otp.errors?.['required']) { الكود مطلوب. } @else { الكود لازم يكون 6 أرقام. }
+          </div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg w-100" [disabled]="loading">
+        @if (loading) { <span class="spinner-border spinner-border-sm me-2"></span> جاري التحقق... } @else { تحقق }
+      </button>
+    </form>
+
+    <div class="text-center mt-3">
+      <span class="text-muted small">ماوصلكش الكود؟</span>
+      <button type="button" class="btn btn-link" (click)="resendOtp()" [disabled]="!canResend || resendLoading">
+        {{ resendLoading ? 'جاري الإرسال...' : canResend ? 'إعادة الإرسال' : 'إعادة الإرسال بعد ' + resendCountdown + ' ث' }}
+      </button>
+    </div>
+  </div>
+</div>

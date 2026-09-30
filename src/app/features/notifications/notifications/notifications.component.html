@@ -1,0 +1,39 @@
+<div class="page-head">
+  <h1 class="page-title"><i class="fa-solid fa-bell"></i> الإشعارات</h1>
+  <button type="button" class="btn btn-outline-primary btn-sm" [disabled]="loading" (click)="loadNotifications(currentPage, true)">
+    <i class="fa-solid fa-rotate me-1" [class.fa-spin]="loading"></i> تحديث
+  </button>
+</div>
+
+@if (loading && notifications.length === 0) {
+  <div aria-busy="true">
+    @for (i of [1, 2, 3]; track i) {
+      <div class="skeleton mb-2" style="height: 84px; border-radius: 14px"></div>
+    }
+  </div>
+} @else if (notifications.length === 0) {
+  <div class="empty-state surface">
+    <i class="fa-regular fa-bell-slash"></i>
+    <h5>لا توجد إشعارات</h5>
+    <p class="mb-0">هتظهر هنا كل التحديثات الخاصة بطلباتك.</p>
+  </div>
+} @else {
+  <div class="d-grid gap-2" [class.opacity-50]="loading">
+    @for (notification of notifications; track $index) {
+      <div class="surface notification-card">
+        <div class="notification-card__icon"><i class="fa-solid fa-bell"></i></div>
+        <div class="flex-grow-1 min-w-0">
+          <h6 class="mb-1">{{ notification.title }}</h6>
+          <p class="mb-1 text-muted">{{ notification.message }}</p>
+          @if (notification.createdAt) {
+            <small class="text-secondary">
+              <i class="bi bi-clock me-1"></i>{{ notification.createdAt | date:'dd/MM/yyyy h:mm a':'':'ar-EG' }}
+            </small>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <app-pagination [pageIndex]="currentPage" [totalPages]="totalPages" (pageChange)="goToPage($event)"></app-pagination>
+}

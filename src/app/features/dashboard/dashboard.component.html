@@ -1,0 +1,248 @@
+<div>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">Admin Dashboard</h2>
+      <p class="text-muted mb-0">إضافة منتج جديد</p>
+    </div>
+
+<div class="d-flex gap-2">
+
+  <a routerLink="/products" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>
+    المنتجات
+  </a>
+
+  <a routerLink="/dashboard/products" class="btn btn-primary">
+    <i class="bi bi-box-seam me-1"></i>
+    إدارة المنتجات
+  </a>
+
+</div>
+  </div>
+
+
+
+
+  <!-- Add Product -->
+  <div class="card shadow-sm">
+
+    <div class="card-body">
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <!-- Product Name -->
+        <div class="mb-3">
+
+          <label class="form-label">
+            اسم المنتج
+          </label>
+
+          <input
+            type="text"
+            class="form-control"
+            formControlName="name"
+            placeholder="اكتب اسم المنتج">
+
+          <div
+            *ngIf="form.controls.name.touched && form.controls.name.invalid"
+            class="text-danger mt-1">
+
+            اسم المنتج مطلوب
+
+          </div>
+
+        </div>
+
+
+        <!-- Description -->
+        <div class="mb-3">
+
+          <label class="form-label">
+            الوصف
+          </label>
+
+          <textarea
+            class="form-control"
+            rows="4"
+            formControlName="description"
+            placeholder="اكتب وصف المنتج">
+          </textarea>
+
+          <div
+            *ngIf="
+              form.controls.description.touched &&
+              form.controls.description.invalid
+            "
+            class="text-danger mt-1">
+
+            وصف المنتج مطلوب
+
+          </div>
+
+        </div>
+
+
+        <!-- Quantity -->
+        <div class="mb-3">
+
+          <label class="form-label">
+            الكمية
+          </label>
+
+          <input
+            type="number"
+            class="form-control"
+            formControlName="stockQuantity"
+            min="1"
+            placeholder="اكتب الكمية">
+
+          <div
+            *ngIf="
+              form.controls.stockQuantity.touched &&
+              form.controls.stockQuantity.invalid
+            "
+            class="text-danger mt-1">
+
+            الكمية يجب أن تكون أكبر من 0
+
+          </div>
+
+        </div>
+
+
+        <!-- Price -->
+        <div class="mb-3">
+
+          <label class="form-label">
+            السعر
+          </label>
+
+          <input
+            type="number"
+            class="form-control"
+            formControlName="price"
+            min="1"
+            placeholder="اكتب السعر">
+
+          <div
+            *ngIf="
+              form.controls.price.touched &&
+              form.controls.price.invalid
+            "
+            class="text-danger mt-1">
+
+            السعر يجب أن يكون أكبر من 0
+
+          </div>
+
+        </div>
+
+
+        <!-- Brand -->
+        <div class="mb-3">
+
+          <label class="form-label">
+            Brand
+          </label>
+
+          <select
+            class="form-select"
+            formControlName="productBrandId">
+
+            <option [ngValue]="0">
+              {{ loadingBrands ? 'جاري تحميل الـ Brands...' : 'اختر الـ Brand' }}
+            </option>
+
+            <option
+              *ngFor="let brand of brands"
+              [ngValue]="brand.id">
+
+              {{ brand.name }}
+
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Category -->
+        <div class="mb-3">
+
+          <label class="form-label">
+            Category
+          </label>
+
+          <select
+            class="form-select"
+            formControlName="productCategoryId">
+
+            <option [ngValue]="0">
+              {{ loadingCategories ? 'جاري تحميل الـ Categories...' : 'اختر الـ Category' }}
+            </option>
+
+            <option
+              *ngFor="let category of categories"
+              [ngValue]="category.id">
+
+              {{ category.name }}
+
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Image -->
+        <div class="mb-4">
+
+          <label class="form-label">
+            صورة المنتج
+          </label>
+
+          <input
+            type="file"
+            class="form-control"
+            accept="image/*"
+            (change)="onImageSelected($event)">
+
+          <div
+            *ngIf="selectedImage"
+            class="text-success mt-2">
+
+            تم اختيار:
+            {{ selectedImage.name }}
+
+          </div>
+
+        </div>
+
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="btn btn-primary w-100"
+          [disabled]="loading">
+
+          <span
+            *ngIf="loading"
+            class="spinner-border spinner-border-sm me-2">
+          </span>
+
+          {{ loading ? 'جاري إضافة المنتج...' : 'إضافة المنتج' }}
+
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- Products List -->
+
+
+</div>

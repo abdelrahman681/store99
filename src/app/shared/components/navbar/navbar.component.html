@@ -1,0 +1,138 @@
+<nav class="navbar navbar-expand-lg app-navbar">
+  <div class="container">
+
+    <!-- Brand -->
+    <a class="navbar-brand" routerLink="/products">
+      <span class="brand-mark"><i class="bi bi-bag-fill"></i></span>
+      Store99
+    </a>
+
+    <!-- Phone: cart + menu button are always visible -->
+    <div class="d-flex align-items-center gap-2 d-lg-none">
+      <a class="nav-icon-btn" routerLink="/basket" aria-label="السلة">
+        <i class="bi bi-cart3"></i>
+        @if ((basketCount$ | async); as count) {
+          <span class="cart-badge">{{ count }}</span>
+        }
+      </a>
+      <button
+        type="button"
+        class="nav-icon-btn"
+        aria-label="القائمة"
+        [attr.aria-expanded]="menuOpen"
+        (click)="toggleMenu()">
+        <i class="bi" [class.bi-list]="!menuOpen" [class.bi-x-lg]="menuOpen"></i>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse" [class.show]="menuOpen" id="navMenu">
+
+      <!-- Main links -->
+      <ul class="navbar-nav me-auto gap-lg-1 mt-1 mt-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/products" routerLinkActive="active">
+            <i class="fa-solid fa-store"></i>المنتجات
+          </a>
+        </li>
+
+        @if (user$ | async) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/orders" routerLinkActive="active">
+              <i class="fa-solid fa-box"></i>طلباتي
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/addresses" routerLinkActive="active">
+              <i class="fa-solid fa-location-dot"></i>العناوين
+            </a>
+          </li>
+        }
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/wishlist" routerLinkActive="active">
+            <i class="fa-solid fa-heart"></i>المفضلة
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/contact" routerLinkActive="active">
+            <i class="fa-solid fa-headset"></i>تواصل معنا
+          </a>
+        </li>
+
+        @if (user$ | async) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/notifications" routerLinkActive="active">
+              <i class="fa-solid fa-bell"></i>الإشعارات
+            </a>
+          </li>
+       @if (user$ | async; as user) {
+  @if (user.roleName === 'Admin') {
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
+        <i class="bi bi-speedometer2"></i>لوحة التحكم
+      </a>
+    </li>
+  }
+}
+        }
+      </ul>
+
+      <!-- Actions -->
+      <ul class="navbar-nav align-items-lg-center gap-lg-2">
+
+        <!-- Cart (desktop) -->
+        <li class="nav-item d-none d-lg-block">
+          <a class="nav-icon-btn" routerLink="/basket" aria-label="السلة">
+            <i class="bi bi-cart3"></i>
+            @if ((basketCount$ | async); as count) {
+              <span class="cart-badge">{{ count }}</span>
+            }
+          </a>
+        </li>
+
+        @if (user$ | async; as user) {
+
+          <!-- Desktop user menu -->
+          <li class="nav-item d-none d-lg-block user-menu">
+            <button type="button" class="user-chip" (click)="toggleUserMenu($event)" [attr.aria-expanded]="userMenuOpen">
+              @if (photo(user.pictureUrl); as src) {
+                <img class="avatar" [src]="src" alt="">
+              } @else {
+                <span class="avatar">{{ initial(user.displayName) }}</span>
+              }
+              <span class="name">{{ user.displayName }}</span>
+              <i class="bi bi-chevron-down small"></i>
+            </button>
+
+            @if (userMenuOpen) {
+              <div class="user-dropdown" role="menu">
+                <a routerLink="/profile"><i class="bi bi-person"></i>الملف الشخصي</a>
+                <a routerLink="/orders"><i class="bi bi-bag"></i>طلباتي</a>
+                <hr>
+                <button type="button" class="danger" (click)="logout()"><i class="bi bi-box-arrow-right"></i>تسجيل الخروج</button>
+              </div>
+            }
+          </li>
+
+          <!-- Phone: profile + logout inline -->
+          <li class="nav-item d-lg-none mobile-user">
+            <a class="nav-link" routerLink="/profile" routerLinkActive="active">
+              <i class="bi bi-person"></i>{{ user.displayName }}
+            </a>
+          </li>
+          <li class="nav-item d-lg-none">
+            <button type="button" class="nav-link w-100 text-start border-0 bg-transparent" (click)="logout()">
+              <i class="bi bi-box-arrow-right"></i>تسجيل الخروج
+            </button>
+          </li>
+
+        } @else {
+          <li class="nav-item d-flex gap-2 mt-2 mt-lg-0 mobile-user">
+            <a class="btn btn-sm btn-nav-ghost flex-fill" routerLink="/auth/login">دخول</a>
+            <a class="btn btn-sm btn-nav-solid flex-fill" routerLink="/auth/register">حساب جديد</a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

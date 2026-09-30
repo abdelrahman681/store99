@@ -1,0 +1,110 @@
+<style>
+  .required-field::after {
+  content: " *";
+  color: #dc3545; /* لون أحمر الخاص بـ Bootstrap */
+  font-weight: bold;
+}
+</style>
+<div class="auth-wrap">
+  <div class="auth-card auth-card--wide">
+
+    <div class="auth-icon"><i class="fa-solid fa-user-plus"></i></div>
+    <h1 class="auth-title">إنشاء حساب جديد</h1>
+    <p class="auth-sub">قم بإنشاء حسابك للبدء في التسوق.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="row g-3">
+
+        <!-- Name -->
+        <div class="col-12 col-md-6">
+          <label class="form-label required-field" for="displayName">الاسم</label>
+          <input id="displayName" type="text" class="form-control" formControlName="displayName" autocomplete="name"
+                 placeholder="أدخل اسمك"
+                 [class.is-invalid]="form.get('displayName')?.invalid && form.get('displayName')?.touched">
+          <div class="invalid-feedback">الاسم مطلوب</div>
+        </div>
+
+        <!-- Phone -->
+   <div class="col-12 col-md-6">
+<label class="form-label required-field" for="phoneNumber">رقم الهاتف</label>
+  <input id="phoneNumber" type="tel" dir="ltr" class="form-control" maxlength="11" minlength="11" formControlName="phoneNumber" autocomplete="tel"
+         placeholder="01xxxxxxxxx"
+         [class.is-invalid]="form.get('phoneNumber')?.invalid && form.get('phoneNumber')?.touched">
+  
+  <div class="invalid-feedback" *ngIf="form.get('phoneNumber')?.touched">
+    <span *ngIf="form.get('phoneNumber')?.hasError('required')">رقم الهاتف مطلوب</span>
+    <span *ngIf="form.get('phoneNumber')?.hasError('minlength')">رقم الهاتف يجب أن يحتوي على 11 رقمًا</span>
+  </div>
+</div>
+
+        <!-- Email -->
+        <div class="col-12">
+          <label class="form-label required-field" for="email">البريد الإلكتروني</label>
+          <input id="email" type="email" dir="ltr" class="form-control" formControlName="email" autocomplete="email"
+                 placeholder="example@email.com"
+                 [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched">
+          <div class="invalid-feedback">من فضلك أدخل بريد إلكتروني صحيح</div>
+        </div>
+
+        <!-- Password -->
+        <div class="col-12">
+          <label class="form-label required-field" for="password">كلمة المرور</label>
+          <div class="password-field">
+            <input id="password" class="form-control" formControlName="password" autocomplete="new-password"
+                   placeholder="أدخل كلمة المرور"
+                   [type]="showPassword ? 'text' : 'password'"
+                   [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched">
+            <button type="button" class="password-toggle" (click)="showPassword = !showPassword"
+                    [attr.aria-label]="showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <div class="form-text" [class.text-danger]="form.get('password')?.invalid && form.get('password')?.touched">
+            8 أحرف على الأقل، وتحتوي على حرف كبير وصغير ورقم ورمز خاص (&#64;$!%*?&amp;)
+          </div>
+        </div>
+
+        <!-- Date of birth -->
+        <div class="col-12 col-md-6 required-field">
+          <label class="form-label" for="dob">تاريخ الميلاد</label>
+          <input id="dob" type="date" class="form-control" formControlName="DOB"
+                 [class.is-invalid]="form.get('DOB')?.invalid && form.get('DOB')?.touched">
+          <div class="invalid-feedback">تاريخ الميلاد مطلوب</div>
+        </div>
+
+        <!-- Gender -->
+        <div class="col-12 col-md-6 required-field">
+          <label class="form-label" for="gender">النوع</label>
+          <select id="gender" class="form-select" formControlName="Gender">
+            <option value="Male">ذكر</option>
+            <option value="Female">أنثى</option>
+          </select>
+        </div>
+
+        <!-- Photo -->
+        <div class="col-12">
+          <label class="form-label" for="photo">الصورة الشخصية <span class="text-muted fw-normal">(اختياري)</span></label>
+          <input id="photo" type="file" class="form-control" accept="image/*" (change)="onPhotoSelected($event)">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg w-100 mt-4" [disabled]="loading$ | async">
+        @if (loading$ | async) {
+          <span class="spinner-border spinner-border-sm me-2"></span> جاري إنشاء الحساب...
+        } @else {
+          إنشاء الحساب
+        }
+      </button>
+    </form>
+
+    <div class="auth-divider"><span>أو</span></div>
+
+    <div class="d-flex justify-content-center">
+      <div id="google-button-register"></div>
+    </div>
+
+    <p class="text-center text-muted mt-4 mb-0">
+      عندك حساب بالفعل؟ <a routerLink="/auth/login" class="fw-bold">تسجيل الدخول</a>
+    </p>
+  </div>
+</div>

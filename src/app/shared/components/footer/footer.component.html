@@ -1,0 +1,35 @@
+<footer class="app-footer">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-12 col-md-5">
+        <div class="brand">
+          <span class="brand-mark"><i class="bi bi-bag-fill"></i></span>
+          Store99
+        </div>
+        <p class="mb-0">وجهتك للتسوق أونلاين بأسعار وجودة تناسبك.</p>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <h6 class="mb-3">روابط سريعة</h6>
+        <ul>
+          <li><a routerLink="/products" class="foot-link">المنتجات</a></li>
+          <li><a routerLink="/wishlist" class="foot-link">المفضلة</a></li>
+          <li><a routerLink="/orders" class="foot-link">طلباتي</a></li>
+          <li><a routerLink="/contact" class="foot-link">تواصل معنا</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-4">
+        <h6 class="mb-3">تابعنا</h6>
+        <div class="social">
+          <a href="#" (click)="$event.preventDefault()" aria-label="فيسبوك"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" (click)="$event.preventDefault()" aria-label="إنستجرام"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" (click)="$event.preventDefault()" aria-label="إكس"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" (click)="$event.preventDefault()" aria-label="واتساب"><i class="fa-brands fa-whatsapp"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">© {{ year }} Store99 — جميع الحقوق محفوظة</div>
+  </div>
+</footer>

@@ -1,0 +1,497 @@
+<div>
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+      <h2 class="mb-1">
+        إدارة المنتجات
+      </h2>
+
+      <p class="text-muted mb-0">
+        عرض وإدارة جميع المنتجات
+      </p>
+    </div>
+
+    <div class="d-flex gap-2">
+
+      <a
+        routerLink="/dashboard"
+        class="btn btn-primary">
+
+        <i class="bi bi-plus-lg me-1"></i>
+        إضافة منتج
+
+      </a>
+
+      <a
+        routerLink="/products"
+        class="btn btn-outline-secondary">
+
+        <i class="bi bi-arrow-left me-1"></i>
+        المنتجات
+
+      </a>
+
+    </div>
+
+  </div>
+
+
+
+
+  <!-- ========================= -->
+  <!-- Edit Product Form -->
+  <!-- ========================= -->
+
+  <div
+    *ngIf="editingProduct"
+    class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+          <h4 class="mb-1">
+            تعديل المنتج
+          </h4>
+
+          <p class="text-muted mb-0">
+            تعديل بيانات المنتج رقم #{{ selectedProduct.id }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="cancelEdit()">
+
+          <i class="bi bi-x-lg me-1"></i>
+          إلغاء
+
+        </button>
+
+      </div>
+
+
+      <div class="row g-3">
+
+        <!-- Product Name -->
+        <div class="col-md-6">
+
+          <label class="form-label">
+            اسم المنتج
+          </label>
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="selectedProduct.name">
+
+        </div>
+
+
+        <!-- Price -->
+        <div class="col-md-3">
+
+          <label class="form-label">
+            السعر
+          </label>
+
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="selectedProduct.price">
+
+        </div>
+
+
+        <!-- Stock -->
+        <div class="col-md-3">
+
+          <label class="form-label">
+            الكمية
+          </label>
+
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="selectedProduct.stockQuantity">
+
+        </div>
+
+
+        <!-- Description -->
+        <div class="col-12">
+
+          <label class="form-label">
+            الوصف
+          </label>
+
+          <textarea
+            class="form-control"
+            rows="4"
+            [(ngModel)]="selectedProduct.description">
+          </textarea>
+
+        </div>
+
+
+        <!-- Brand -->
+        <div class="col-md-6">
+
+          <label class="form-label">
+            Brand
+          </label>
+
+          <select
+            class="form-select"
+            [(ngModel)]="selectedProduct.productBrandId">
+
+            <option [ngValue]="0">
+              {{ loadingBrands ? 'جاري تحميل الـ Brands...' : 'اختر الـ Brand' }}
+            </option>
+
+            <option
+              *ngFor="let brand of brands"
+              [ngValue]="brand.id">
+
+              {{ brand.name }}
+
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Category -->
+        <div class="col-md-6">
+
+          <label class="form-label">
+            Category
+          </label>
+
+          <select
+            class="form-select"
+            [(ngModel)]="selectedProduct.productCategoryId">
+
+            <option [ngValue]="0">
+              {{ loadingCategories ? 'جاري تحميل الـ Categories...' : 'اختر الـ Category' }}
+            </option>
+
+            <option
+              *ngFor="let category of categories"
+              [ngValue]="category.id">
+
+              {{ category.name }}
+
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Current Image -->
+        <div class="col-md-6">
+
+          <label class="form-label d-block">
+            الصورة الحالية
+          </label>
+
+          <img
+            [src]="selectedProduct.pictureUrl"
+            [alt]="selectedProduct.name"
+            width="120"
+            height="120"
+            style="object-fit: contain; border-radius: 10px; border: 1px solid #ddd; padding: 5px;">
+
+        </div>
+
+
+        <!-- New Image -->
+        <div class="col-md-6">
+
+          <label class="form-label">
+            الصورة الجديدة
+          </label>
+
+          <input
+            type="file"
+            class="form-control"
+            accept="image/*"
+            (change)="onImageSelected($event)">
+
+          <small class="text-muted d-block mt-2">
+            اختياري — اتركها فارغة للاحتفاظ بالصورة الحالية.
+          </small>
+
+          <small
+            *ngIf="selectedImage"
+            class="text-success d-block mt-2">
+
+            <i class="bi bi-check-circle me-1"></i>
+
+            {{ selectedImage.name }}
+
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- Save Buttons -->
+      <div class="d-flex justify-content-end gap-2 mt-4">
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          [disabled]="savingProduct"
+          (click)="cancelEdit()">
+
+          إلغاء
+
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="savingProduct"
+          (click)="updateProduct()">
+
+          <span
+            *ngIf="savingProduct"
+            class="spinner-border spinner-border-sm me-1">
+          </span>
+
+          <i
+            *ngIf="!savingProduct"
+            class="bi bi-check-lg me-1">
+          </i>
+
+          {{ savingProduct ? 'جاري الحفظ...' : 'حفظ التعديل' }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- Products Card -->
+  <!-- ========================= -->
+
+  <div class="card shadow-sm">
+
+    <div class="card-body">
+
+      <!-- Card Header -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+          <h4 class="mb-1">
+            المنتجات
+          </h4>
+
+          <p class="text-muted mb-0">
+            قائمة المنتجات الموجودة حالياً
+          </p>
+
+        </div>
+
+        <span class="badge bg-secondary">
+          {{ products.length }} منتجات
+        </span>
+
+      </div>
+
+
+      <!-- Loading -->
+      <div
+        *ngIf="loadingProducts"
+        class="text-center py-5">
+
+        <div class="spinner-border text-primary"></div>
+
+        <p class="mt-2 mb-0 text-muted">
+          جاري تحميل المنتجات...
+        </p>
+
+      </div>
+
+
+      <!-- No Products -->
+      <div
+        *ngIf="!loadingProducts && products.length === 0"
+        class="text-center py-5 text-muted">
+
+        <i class="bi bi-box-seam fs-1 d-block mb-3"></i>
+
+        <p class="mb-0">
+          لا توجد منتجات حالياً.
+        </p>
+
+      </div>
+
+
+      <!-- Products Table -->
+      <div
+        *ngIf="!loadingProducts && products.length > 0"
+        class="table-responsive">
+
+        <table class="table table-hover align-middle">
+
+          <thead class="table-dark">
+
+            <tr>
+
+              <th>ID</th>
+              <th>الصورة</th>
+              <th>المنتج</th>
+              <th>السعر</th>
+              <th>الكمية</th>
+              <th>Actions</th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            <tr *ngFor="let product of products">
+
+              <!-- ID -->
+              <td>
+                {{ product.id }}
+              </td>
+
+
+              <!-- Image -->
+              <td>
+
+                <img
+                  [src]="product.pictureUrl"
+                  [alt]="product.name"
+                  width="60"
+                  height="60"
+                  style="object-fit: contain; border-radius: 8px; border: 1px solid #eee; padding: 4px;">
+
+              </td>
+
+
+              <!-- Product Name -->
+              <td>
+
+                <strong>
+                  {{ product.name }}
+                </strong>
+
+                <div class="text-muted small">
+                  {{ product.brandName || 'بدون Brand' }}
+                </div>
+
+              </td>
+
+
+              <!-- Price -->
+              <td>
+                {{ product.price }} EGP
+              </td>
+
+
+              <!-- Stock -->
+              <td>
+                {{ product.stockQuantity }}
+              </td>
+
+
+              <!-- Actions -->
+              <td>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary me-2"
+                  (click)="editProduct(product)">
+
+                  <i class="bi bi-pencil me-1"></i>
+                  تعديل
+
+                </button>
+
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger deleteButton"
+                  (click)="deleteProduct(product.id)">
+
+                  <i class="bi bi-trash me-1"></i>
+                  مسح
+
+                </button>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <!-- Pagination -->
+      <div
+        *ngIf="!loadingProducts && totalPages > 1"
+        class="d-flex justify-content-center align-items-center gap-2 mt-4">
+
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          [disabled]="currentPage === 1"
+          (click)="goToPage(currentPage - 1)">
+
+          <i class="bi bi-chevron-right"></i>
+          السابق
+
+        </button>
+
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let i = index"
+          type="button"
+          class="btn"
+          [class.btn-primary]="currentPage === i + 1"
+          [class.btn-outline-primary]="currentPage !== i + 1"
+          (click)="goToPage(i + 1)">
+
+          {{ i + 1 }}
+
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-outline-primary btn01"
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(currentPage + 1)">
+          التالي
+          <i class="bi bi-chevron-left"></i>
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
