@@ -51,11 +51,11 @@ export class BasketEffects {
 
       switchMap(() =>
         this.basketService.getBasket().pipe(
-          map(basket =>
-            BasketActions.loadBasketSuccess({
-              basket: basket ?? createEmptyBasket('')
-            })
-          ),
+  map(basket =>
+  BasketActions.loadBasketSuccess({
+    basket
+  })
+),
 
           catchError(error => {
             console.error('Load Basket Error:', error);

@@ -4,7 +4,9 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CustomerBasket } from '../models/basket.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class BasketService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/Basket`;
