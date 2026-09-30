@@ -156,7 +156,7 @@ form = this.fb.nonNullable.group({
   lName: ['', Validators.required],
   street: ['', Validators.required],
   city: ['', Validators.required],
-  country: ['', Validators.required],
+  government: ['', Validators.required],
   deliveryMethodId: [0, Validators.required],
   paymentMethod: ['cod' as 'card' | 'cod']
 });
@@ -514,9 +514,9 @@ if (this.form.controls.city.invalid) {
   return;
 }
 
-if (this.form.controls.country.invalid) {
+if (this.form.controls.government.invalid) {
 
-  this.form.controls.country.markAsTouched();
+  this.form.controls.government.markAsTouched();
 
   this.toastService.show(
     'من فضلك أدخل المحافظة',
@@ -583,7 +583,7 @@ if (this.form.controls.deliveryMethodId.invalid) {
                 v.city,
 
               government:
-                v.country
+                v.government
 
             }
 
@@ -708,7 +708,7 @@ if (this.form.controls.deliveryMethodId.invalid) {
                   v.city,
 
                 government:
-                  v.country
+                  v.government
 
               }
 
@@ -827,7 +827,7 @@ if (this.form.controls.deliveryMethodId.invalid) {
       city:
         address.city,
 
-      country:
+      government:
         address.government
 
     });

@@ -26,7 +26,7 @@ export class AddressListComponent implements OnInit {
   form: FormGroup = this.fb.group({
     city: ['', Validators.required],
     street: ['', Validators.required],
-    country: ['', Validators.required]
+    government: ['', Validators.required]
   });
 
   ngOnInit(): void {
@@ -49,7 +49,7 @@ export class AddressListComponent implements OnInit {
 
   edit(a: AddressDTO): void {
     this.editingId = a.id ?? null;
-    this.form.patchValue({ city: a.city, street: a.street, country: a.government });
+    this.form.patchValue({ city: a.city, street: a.street, government: a.government });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
