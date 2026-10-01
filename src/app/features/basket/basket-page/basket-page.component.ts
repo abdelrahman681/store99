@@ -1,3 +1,4 @@
+import { ProductPathPipe } from '../../../shared/pipes/product-path.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -13,7 +14,7 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-basket-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ProductPathPipe],
   templateUrl: './basket-page.component.html'
 })
 export class BasketPageComponent {

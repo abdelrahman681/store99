@@ -1,24 +1,26 @@
-/** Arabic label + badge colour for the order statuses the API returns. Unknown values fall back to the raw text. */
-const LABELS: Record<string, string> = {
-  Pending: 'قيد الانتظار',
-  PaymentReceived: 'تم الدفع',
-  PaymentFailed: 'فشل الدفع',
-  Cancelled: 'ملغي',
-  Canceled: 'ملغي'
+/** Arabic label + badge colour for the order statuses the API returns (matching is case-insensitive). */
+const INFO: Record<string, { label: string; tone: string }> = {
+  pending:            { label: 'قيد الانتظار', tone: 'warning' },
+  paymentreceived:    { label: 'تم الدفع', tone: 'success' },
+  paymentsuccessfully:{ label: 'تم الدفع', tone: 'success' },
+  paymentsuccess:     { label: 'تم الدفع', tone: 'success' },
+  paid:               { label: 'تم الدفع', tone: 'success' },
+  paymentfailed:      { label: 'فشل الدفع', tone: 'danger' },
+  cancelled:          { label: 'ملغي', tone: 'danger' },
+  canceled:           { label: 'ملغي', tone: 'danger' }
 };
 
-const TONES: Record<string, string> = {
-  Pending: 'warning',
-  PaymentReceived: 'success',
-  PaymentFailed: 'danger',
-  Cancelled: 'danger',
-  Canceled: 'danger'
-};
+const key = (status: string | null | undefined) => (status ?? '').replace(/[\s_-]/g, '').toLowerCase();
 
 export function orderStatusLabel(status: string | null | undefined): string {
-  return (status && LABELS[status]) || status || '—';
+  return INFO[key(status)]?.label || status || '—';
 }
 
 export function orderStatusClass(status: string | null | undefined): string {
-  return `status-badge status-badge--${(status && TONES[status]) || 'muted'}`;
+  return `status-badge status-badge--${INFO[key(status)]?.tone || 'muted'}`;
+}
+
+/** A card order stays "Pending" until the payment webhook reaches the API — the UI polls until it flips. */
+export function isAwaitingPayment(order: { status?: string | null; paymentMethod?: string | null } | null | undefined): boolean {
+  return !!order && key(order.status) === 'pending' && (order.paymentMethod ?? '').toLowerCase() === 'card';
 }

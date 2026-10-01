@@ -17,6 +17,10 @@ export const OrdersActions = createActionGroup({
     'Load Order Success': props<{ order: OrderToReturn }>(),
     'Load Order Failure': props<{ error: string }>(),
 
+    'Refresh Order': props<{ id: number }>(),
+    'Refresh Order Success': props<{ order: OrderToReturn }>(),
+    'Refresh Orders': props<{ pageIndex?: number; pageSize?: number }>(),
+    'Refresh Orders Success': props<{ result: Pagination<OrderToReturn> }>(),
     'Cancel Order': props<{ id: number }>(),
     'Cancel Order Success': props<{ id: number }>(),
     'Cancel Order Failure': props<{ error: string }>(),

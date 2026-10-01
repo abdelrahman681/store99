@@ -132,6 +132,21 @@ export const ordersReducer = createReducer(
     })
   ),
 
+  // silent refresh (polling): replaces the data without the loading flag, so the page doesn't flicker
+  on(
+    OrdersActions.refreshOrderSuccess,
+    (state, { order }) => ({ ...state, selected: order })
+  ),
+  on(
+    OrdersActions.refreshOrdersSuccess,
+    (state, { result }) => ({
+      ...state,
+      items: result.data,
+      currentPage: result.pageIndex,
+      pageSize: result.pageSize,
+      totalPages: result.totalPages
+    })
+  ),
   on(
     OrdersActions.cancelOrderSuccess,
     (state, { id }) => ({

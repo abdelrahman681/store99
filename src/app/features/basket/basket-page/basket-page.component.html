@@ -19,12 +19,12 @@
         <div class="surface basket-list">
           @for (item of items; track item.productId) {
             <div class="basket-item">
-              <a [routerLink]="['/products', item.productId]" class="basket-item__img">
+              <a [routerLink]="item.productId | productPath: item.name" class="basket-item__img">
                 <img [src]="item.pictureUrl" [alt]="item.name">
               </a>
 
               <div class="basket-item__info">
-                <a [routerLink]="['/products', item.productId]" class="basket-item__name">{{ item.name }}</a>
+                <a [routerLink]="item.productId | productPath: item.name" class="basket-item__name">{{ item.name }}</a>
                 <div class="text-muted small">{{ item.price | number:'1.0-2' }} ج.م للقطعة</div>
 
                 <div class="basket-item__row">

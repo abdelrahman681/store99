@@ -1,3 +1,4 @@
+import { ProductPathPipe } from '../../../shared/pipes/product-path.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -9,7 +10,7 @@ import { PaginationComponent } from '../../../shared/components/pagination/pagin
 @Component({
   selector: 'app-wishlist',
   standalone: true,
-  imports: [CommonModule, RouterLink, PaginationComponent],
+  imports: [CommonModule, RouterLink, PaginationComponent, ProductPathPipe],
   templateUrl: './wishlist.component.component.html'
 })
 export class WishlistComponent implements OnInit {

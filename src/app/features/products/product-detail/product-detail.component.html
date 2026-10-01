@@ -113,3 +113,7 @@
     </div>
   </div>
 }
+
+@if (!loading) {
+  <app-product-reviews [productId]="productId" (changed)="onReviewsChanged()"></app-product-reviews>
+}

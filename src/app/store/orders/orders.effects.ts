@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 
 import {
+  EMPTY,
   catchError,
   map,
   of,
@@ -16,6 +17,7 @@ import { OrderService } from '../../core/services/order.service';
 import { ToastService } from '../../core/services/toast.service';
 
 import { BasketActions } from '../basket/basket.actions';
+import { apiErrorMessage } from '../../core/utils/api-error';
 import { OrdersActions } from './orders.actions';
 
 @Injectable()
@@ -254,59 +256,45 @@ export class OrdersEffects {
 
   cancelOrder$ = createEffect(() =>
     this.actions$.pipe(
-
-      ofType(
-        OrdersActions.cancelOrder
-      ),
-
+      ofType(OrdersActions.cancelOrder),
       switchMap(({ id }) =>
-
-        this.orderService
-          .cancelOrder(id)
-          .pipe(
-
-            tap(() => {
-
-              this.toastService.show(
-                'تم إلغاء الطلب بنجاح ✅',
-                'success'
-              );
-
-            }),
-
-            map(() =>
-              OrdersActions.cancelOrderSuccess({
-                id
-              })
-            ),
-
-            catchError(
-              (err: HttpErrorResponse) => {
-
-                this.toastService.show(
-                  err.error?.message ??
-                  'تعذر إلغاء الطلب',
-                  'error'
-                );
-
-                return of(
-                  OrdersActions.cancelOrderFailure({
-                    error:
-                      err.error?.message ??
-                      'تعذر إلغاء الطلب'
-                  })
-                );
-
-              }
-            )
-
-          )
-
+        this.orderService.cancelOrder(id).pipe(
+          tap(() => this.toastService.show('تم إلغاء الطلب بنجاح ✅', 'success')),
+          map(() => OrdersActions.cancelOrderSuccess({ id })),
+          catchError((err: HttpErrorResponse) => {
+            const message = apiErrorMessage(err, 'تعذر إلغاء الطلب');
+            this.toastService.show(message, 'error');
+            return of(OrdersActions.cancelOrderFailure({ error: message }));
+          })
+        )
       )
-
     )
   );
 
+  // Silent refreshes used while waiting for the payment webhook (errors are ignored on purpose)
+  refreshOrder$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrdersActions.refreshOrder),
+      switchMap(({ id }) =>
+        this.orderService.getOrderById(id).pipe(
+          map(order => OrdersActions.refreshOrderSuccess({ order })),
+          catchError(() => EMPTY)
+        )
+      )
+    )
+  );
+
+  refreshOrders$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrdersActions.refreshOrders),
+      switchMap(({ pageIndex, pageSize }) =>
+        this.orderService.getOrdersForUser(pageIndex, pageSize).pipe(
+          map(result => OrdersActions.refreshOrdersSuccess({ result })),
+          catchError(() => EMPTY)
+        )
+      )
+    )
+  );
 
   // =========================================================
   // REFRESH ORDERS AFTER CANCEL

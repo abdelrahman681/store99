@@ -97,6 +97,24 @@ export const routes: Routes = [
     path: 'dashboard/products',
     component: ProductsManagementComponent
   },
+  {
+    path: 'dashboard/users',
+    loadComponent: () =>
+      import('./features/dashboard/users-management/users-management.component')
+        .then(m => m.UsersManagementComponent)
+  },
+  {
+    path: 'dashboard/roles',
+    loadComponent: () =>
+      import('./features/dashboard/roles-management/roles-management.component')
+        .then(m => m.RolesManagementComponent)
+  },
+  {
+    path: 'dashboard/orders',
+    loadComponent: () =>
+      import('./features/dashboard/orders-management/orders-management.component')
+        .then(m => m.OrdersManagementComponent)
+  },
 
   {
     path: 'contact',

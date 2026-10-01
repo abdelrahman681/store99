@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { EMPTY, catchError, tap } from 'rxjs';
+import { BehaviorSubject, EMPTY, catchError, switchMap, tap } from 'rxjs';
 
 import { BasketActions } from '../../../store/basket/basket.actions';
 import { selectBasketItems } from '../../../store/basket/basket.selectors';
@@ -12,12 +14,14 @@ import { WishlistService } from '../../../core/services/wishlist.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Product } from '../../../core/models/product.model';
+import { productIdFromParam, productSlug } from '../../../core/utils/product-slug';
+import { ProductReviewsComponent } from '../../../shared/components/product-reviews/product-reviews.component';
 import { BasketItem } from '../../../core/models/basket.model';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ProductReviewsComponent],
   templateUrl: './product-detail.component.html'
 })
 export class ProductDetailComponent implements OnInit {
@@ -28,20 +32,48 @@ export class ProductDetailComponent implements OnInit {
   private productService = inject(ProductService);
   private wishlistService = inject(WishlistService);
   private toast = inject(ToastService);
+  private location = inject(Location);
+  private titleService = inject(Title);
 
   loading = true;
 
-  product$ = this.productService
-    .getProductById(Number(this.route.snapshot.paramMap.get('id')))
-    .pipe(
-      tap(() => (this.loading = false)),
-      catchError(() => {
-        this.loading = false;
-        this.toast.error('تعذر تحميل المنتج');
-        this.router.navigate(['/products']);
-        return EMPTY;
-      })
-    );
+  // the URL segment is "10-iphone-15" (or just "10"): the number in front is the product id
+  private routeParam = this.route.snapshot.paramMap.get('id');
+  productId = productIdFromParam(this.routeParam) ?? 0;
+  private refresh$ = new BehaviorSubject<void>(undefined);
+
+  product$ = this.refresh$.pipe(
+    switchMap(() =>
+      this.productService.getProductById(this.productId).pipe(
+        tap(product => {
+          this.loading = false;
+          this.showNameInUrl(product);
+        }),
+        catchError(() => {
+          this.loading = false;
+          this.toast.error('تعذر تحميل المنتج');
+          this.router.navigate(['/products']);
+          return EMPTY;
+        })
+      )
+    )
+  );
+
+  /** /products/10 -> /products/10-iphone-15 (no navigation, no extra history entry), and the tab title */
+  private showNameInUrl(product: Product): void {
+    this.titleService.setTitle(`${product.name} | Store99`);
+
+    const wanted = productSlug(product.id, product.name);
+    if (this.routeParam === wanted) return;
+
+    this.routeParam = wanted;
+    this.location.replaceState(this.router.serializeUrl(this.router.createUrlTree(['/products', wanted])));
+  }
+
+  /** a review was added / edited / deleted → reload the product so its average rating is current */
+  onReviewsChanged(): void {
+    this.refresh$.next();
+  }
 
   basketItems: BasketItem[] = [];
   quantity = 1;

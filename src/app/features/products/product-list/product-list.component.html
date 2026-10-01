@@ -97,7 +97,7 @@
           <div class="col-6 col-md-4 col-lg-3">
             <article class="product-card">
 
-              <a class="product-card__media" [routerLink]="['/products', p.id]" [attr.aria-label]="p.name">
+              <a class="product-card__media" [routerLink]="p.id | productPath: p.name" [attr.aria-label]="p.name">
                 <img [src]="p.pictureUrl" [alt]="p.name" loading="lazy">
               </a>
 
@@ -118,7 +118,7 @@
                 @if (p.brandName) {
                   <span class="product-card__brand">{{ p.brandName }}</span>
                 }
-                <a class="product-card__title" [routerLink]="['/products', p.id]">{{ p.name }}</a>
+                <a class="product-card__title" [routerLink]="p.id | productPath: p.name">{{ p.name }}</a>
 
                 <div class="product-card__price">
                   <span class="price">{{ p.price | number:'1.0-2' }}</span>

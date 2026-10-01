@@ -1,12 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { take, timer } from 'rxjs';
 import { OrdersActions } from '../../../store/orders/orders.actions';
 import { selectAllOrders, selectOrdersLoading, selectOrdersTotalPages } from '../../../store/orders/orders.selectors';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { ConfirmService } from '../../../core/services/confirm.service';
-import { orderStatusClass, orderStatusLabel } from '../../../core/utils/order-status';
+import { OrderToReturn } from '../../../core/models/order.model';
+import { isAwaitingPayment, orderStatusClass, orderStatusLabel } from '../../../core/utils/order-status';
 
 @Component({
   selector: 'app-order-list',
@@ -16,6 +19,7 @@ import { orderStatusClass, orderStatusLabel } from '../../../core/utils/order-st
 })
 export class OrderListComponent implements OnInit {
   private store = inject(Store);
+  private destroyRef = inject(DestroyRef);
   private confirmService = inject(ConfirmService);
 
   currentPage = 1;
@@ -28,8 +32,21 @@ export class OrderListComponent implements OnInit {
   statusLabel = orderStatusLabel;
   statusClass = orderStatusClass;
 
+  private orders: OrderToReturn[] = [];
+
   ngOnInit(): void {
     this.loadOrders();
+
+    this.orders$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(o => (this.orders = o));
+
+    // card orders stay "Pending" until the payment webhook arrives → quietly re-check the list
+    timer(3000, 3000)
+      .pipe(take(20), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.orders.some(o => isAwaitingPayment(o))) {
+          this.store.dispatch(OrdersActions.refreshOrders({ pageIndex: this.currentPage, pageSize: this.pageSize }));
+        }
+      });
   }
 
   loadOrders(): void {

@@ -1,0 +1,65 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><i class="bi bi-shield-lock"></i> إدارة الأدوار</h1>
+    <p class="text-muted mb-0 small">إنشاء وتعديل وحذف أدوار النظام</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a routerLink="/dashboard" class="btn btn-outline-secondary"><i class="bi bi-arrow-right me-1"></i>لوحة التحكم</a>
+  </div>
+</div>
+
+<div class="row g-3 g-lg-4">
+
+  <!-- Add -->
+  <div class="col-lg-4">
+    <div class="surface p-3 p-md-4 summary-card">
+      <h5 class="mb-3">دور جديد</h5>
+      <label class="form-label" for="roleName">اسم الدور</label>
+      <input id="roleName" class="form-control" [(ngModel)]="newName" placeholder="مثال: Manager" maxlength="50"
+             (keydown.enter)="add()">
+      <button type="button" class="btn btn-primary w-100 mt-3" [disabled]="saving" (click)="add()">
+        @if (saving && editingId === null) { <span class="spinner-border spinner-border-sm me-2"></span> }
+        <i class="bi bi-plus-lg me-1"></i> إضافة الدور
+      </button>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="col-lg-8">
+    @if (loading) {
+      @for (i of [1, 2, 3]; track i) { <div class="skeleton mb-2" style="height: 62px; border-radius: 14px"></div> }
+    } @else if (roles.length === 0) {
+      <div class="empty-state surface">
+        <i class="bi bi-shield"></i>
+        <h5>لا توجد أدوار</h5>
+        <p class="mb-0">أضف أول دور من النموذج.</p>
+      </div>
+    } @else {
+      <div class="d-grid gap-2">
+        @for (r of roles; track r.id) {
+          <div class="surface role-row">
+            <div class="role-icon"><i class="bi bi-person-badge"></i></div>
+
+            @if (editingId === r.id) {
+              <input class="form-control flex-grow-1" [(ngModel)]="editName" maxlength="50" aria-label="اسم الدور"
+                     (keydown.enter)="saveEdit(r)" (keydown.escape)="cancelEdit()">
+              <button type="button" class="btn btn-primary" [disabled]="saving" (click)="saveEdit(r)">حفظ</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">إلغاء</button>
+            } @else {
+              <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold">{{ r.name }}</div>
+                @if (isProtected(r)) { <small class="text-muted">دور أساسي — لا يمكن تعديله أو حذفه من هنا</small> }
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="isProtected(r)" (click)="startEdit(r)">
+                <i class="bi bi-pencil"></i><span class="d-none d-sm-inline ms-1">تعديل</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="isProtected(r)" (click)="remove(r)">
+                <i class="bi bi-trash"></i><span class="d-none d-sm-inline ms-1">حذف</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -31,3 +31,9 @@ export interface OrderToReturn {
   paymentMethod: 'Card' | 'CashOnDelivery';
 
 }
+
+export interface UpdateOrderPayload {
+  shippingAddress: ShippingAddress;
+  basketId: string;
+  deliveryMethodId: number;
+}

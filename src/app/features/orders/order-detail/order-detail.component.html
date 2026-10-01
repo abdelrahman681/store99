@@ -10,7 +10,12 @@
 @if (order$ | async; as order) {
   <div class="page-head">
     <h1 class="page-title"><i class="fa-solid fa-receipt"></i> تفاصيل الطلب #{{ order.id }}</h1>
-    <span [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
+    <div class="d-flex align-items-center gap-2">
+      @if (isAwaitingPayment(order)) {
+        <span class="text-muted small"><span class="spinner-border spinner-border-sm me-1"></span>جاري تأكيد الدفع...</span>
+      }
+      <span [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
+    </div>
   </div>
 
   <div class="row g-3 g-lg-4">

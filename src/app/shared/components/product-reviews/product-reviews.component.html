@@ -1,0 +1,86 @@
+<section class="surface p-3 p-md-4 mt-3 mt-lg-4">
+  <h5 class="fw-bold mb-3"><i class="fa-solid fa-star me-2 text-warning"></i>التقييمات</h5>
+
+  <!-- Add / edit form -->
+  @if (user) {
+    <div id="review-form" class="review-form mb-4">
+      <div class="fw-semibold mb-2">{{ editingId !== null ? 'تعديل تقييمك' : 'أضف تقييمك' }}</div>
+
+      <div class="star-picker mb-3" role="radiogroup" aria-label="التقييم" (mouseleave)="hoverRating = 0">
+        @for (n of stars; track n) {
+          <button type="button" class="star-btn" [attr.aria-label]="n + ' نجوم'" [attr.aria-checked]="rating === n"
+                  (mouseenter)="hoverRating = n" (click)="setRating(n)">
+            <i class="fa-star" [class.fa-solid]="n <= (hoverRating || rating)" [class.fa-regular]="n > (hoverRating || rating)"
+               [class.is-on]="n <= (hoverRating || rating)"></i>
+          </button>
+        }
+      </div>
+
+      <textarea class="form-control" rows="3" maxlength="500" placeholder="اكتب رأيك في المنتج (اختياري)"
+                [(ngModel)]="comment"></textarea>
+      <div class="d-flex justify-content-between align-items-center mt-2">
+        <small class="text-muted">{{ comment.length }}/500</small>
+        <div class="d-flex gap-2">
+          @if (editingId !== null) {
+            <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">إلغاء</button>
+          }
+          <button type="button" class="btn btn-primary" [disabled]="saving" (click)="submit()">
+            @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
+            {{ editingId !== null ? 'حفظ التعديل' : 'إرسال التقييم' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="review-login mb-4">
+      <i class="bi bi-lock me-1"></i>
+      <a routerLink="/auth/login" class="fw-bold">سجّل دخولك</a> عشان تضيف تقييمك.
+    </div>
+  }
+
+  <!-- List -->
+  @if (loading) {
+    <div aria-busy="true">
+      @for (i of [1, 2]; track i) { <div class="skeleton mb-2" style="height: 74px"></div> }
+    </div>
+  } @else if (reviews.length === 0) {
+    <div class="text-center text-muted py-3">لا توجد تقييمات بعد — كن أول من يقيّم هذا المنتج.</div>
+  } @else {
+    <div class="review-list">
+      @for (r of reviews; track r.id) {
+        <article class="review-item" [class.is-mine]="isMine(r)">
+          <div class="review-avatar">{{ initial(r) }}</div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <strong>{{ author(r) }}</strong>
+              @if (isMine(r)) { <span class="chip">تقييمك</span> }
+              @if (when(r); as d) { <small class="text-muted">{{ d | date:'dd/MM/yyyy':'':'ar-EG' }}</small> }
+            </div>
+            <div class="review-stars" [attr.aria-label]="r.rating + ' من 5'">
+              @for (n of stars; track n) {
+                <i class="fa-star" [class.fa-solid]="n <= r.rating" [class.fa-regular]="n > r.rating" [class.is-on]="n <= r.rating"></i>
+              }
+            </div>
+            @if (r.comment) { <p class="mb-0 mt-1 review-text">{{ r.comment }}</p> }
+          </div>
+
+          @if (isMine(r)) {
+            <div class="d-flex gap-1 align-self-start">
+              <button type="button" class="btn btn-sm btn-outline-primary" aria-label="تعديل" (click)="startEdit(r)"><i class="bi bi-pencil"></i></button>
+              <button type="button" class="btn btn-sm btn-outline-danger" aria-label="حذف" (click)="remove(r)"><i class="bi bi-trash"></i></button>
+            </div>
+          }
+        </article>
+      }
+    </div>
+
+    @if (hasMore) {
+      <div class="text-center mt-3">
+        <button type="button" class="btn btn-outline-secondary" [disabled]="loadingMore" (click)="load(pageIndex + 1)">
+          @if (loadingMore) { <span class="spinner-border spinner-border-sm me-2"></span> }
+          عرض المزيد
+        </button>
+      </div>
+    }
+  }
+</section>

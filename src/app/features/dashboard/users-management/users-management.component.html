@@ -1,0 +1,104 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><i class="bi bi-people"></i> المستخدمين والأدوار</h1>
+    <p class="text-muted mb-0 small">تحكم في دور كل مستخدم</p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a routerLink="/dashboard/roles" class="btn btn-outline-primary"><i class="bi bi-shield-lock me-1"></i>إدارة الأدوار</a>
+    <a routerLink="/dashboard" class="btn btn-outline-secondary"><i class="bi bi-arrow-right me-1"></i>لوحة التحكم</a>
+  </div>
+</div>
+
+@if (missingIds) {
+  <div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-1"></i>
+    الـ API مش بيرجّع <strong>Id</strong> للمستخدم، فمش هينفع تعدّل الأدوار. أضف <code>Id = user.Id</code> في الـ DTO اللي بيرجّعه <code>GetAllRole</code>.
+  </div>
+}
+
+<!-- Edit panel -->
+@if (editing; as u) {
+  <div id="user-edit" class="surface p-3 p-md-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+      <div class="min-w-0">
+        <h5 class="mb-0">أدوار {{ u.displayName }}</h5>
+        <small class="text-muted text-break" dir="ltr">{{ u.email }}</small>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelEdit()">إغلاق</button>
+    </div>
+
+    @if (roles.length === 0) {
+      <p class="text-muted mb-0">لا توجد أدوار — أنشئ دور من صفحة الأدوار أولاً.</p>
+    } @else {
+      <div class="role-picks">
+        @for (r of roles; track r.id) {
+          <label class="role-pick" [class.is-on]="isChecked(r)" [class.is-locked]="isLocked(r)">
+            <input type="checkbox" class="form-check-input m-0" [checked]="isChecked(r)" [disabled]="isLocked(r)"
+                   (change)="toggle(r, $any($event.target).checked)">
+            <span class="fw-semibold">{{ r.name }}</span>
+          </label>
+        }
+      </div>
+      @if (editing && isMe(editing)) {
+        <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i>ده حسابك — مش هينفع تشيل دور Admin من نفسك.</small>
+      }
+    }
+
+    <div class="d-flex gap-2 mt-3">
+      <button type="button" class="btn btn-primary" [disabled]="saving || changes.length === 0" (click)="save()">
+        @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
+        حفظ
+      </button>
+      <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">إلغاء</button>
+    </div>
+  </div>
+}
+
+<!-- Search -->
+<div class="filters-card mb-3">
+  <div class="search-box">
+    <i class="bi bi-search"></i>
+    <input class="form-control" type="search" placeholder="ابحث بالاسم أو الإيميل..." aria-label="بحث"
+           [(ngModel)]="search" (ngModelChange)="onSearch()">
+  </div>
+</div>
+
+<!-- List -->
+@if (loading) {
+  @for (i of [1, 2, 3, 4]; track i) { <div class="skeleton mb-2" style="height: 72px; border-radius: 14px"></div> }
+} @else if (filtered.length === 0) {
+  <div class="empty-state surface">
+    <i class="bi bi-person-x"></i>
+    <h5>{{ users.length === 0 ? 'لا يوجد مستخدمين' : 'لا توجد نتائج' }}</h5>
+  </div>
+} @else {
+  <div class="d-grid gap-2">
+    @for (u of pageUsers; track u.email) {
+      <div class="surface user-row" [class.is-editing]="editing === u">
+        @if (photo(u); as src) {
+          <img class="user-avatar" [src]="src" alt="">
+        } @else {
+          <span class="user-avatar user-avatar--fallback">{{ initialOf(u) }}</span>
+        }
+
+        <div class="flex-grow-1 min-w-0">
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <strong class="text-truncate">{{ u.displayName }}</strong>
+            @if (isMe(u)) { <span class="chip">أنت</span> }
+          </div>
+          <div class="text-muted small text-truncate" dir="ltr" style="text-align: start">{{ u.email }}</div>
+          <div class="mt-1 d-flex flex-wrap gap-1">
+            @for (role of userRoles(u); track role) { <span class="chip">{{ role }}</span> }
+            @empty { <span class="text-muted small">بدون دور</span> }
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-sm btn-primary" (click)="startEdit(u)">
+          <i class="bi bi-pencil"></i><span class="d-none d-sm-inline ms-1">تعديل الدور</span>
+        </button>
+      </div>
+    }
+  </div>
+
+  <app-pagination [pageIndex]="page" [totalPages]="totalPages" (pageChange)="goTo($event)"></app-pagination>
+}

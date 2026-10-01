@@ -1,3 +1,4 @@
+import { ProductPathPipe } from '../../../shared/pipes/product-path.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -25,7 +26,7 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PaginationComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PaginationComponent, ProductPathPipe],
   templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {

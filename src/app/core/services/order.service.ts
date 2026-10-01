@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Pagination } from '../models/pagination.model';
-import { OrderPayload, OrderToReturn } from '../models/order.model';
+import { OrderPayload, OrderToReturn, UpdateOrderPayload } from '../models/order.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
@@ -23,7 +23,14 @@ export class OrderService {
     return this.http.get<OrderToReturn>(`${this.baseUrl}/GetOrderByIdForSpecificUser/${orderId}`);
   }
 
-  cancelOrder(orderId: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/CancelOrder/${orderId}`, {});
+  // The API answers with plain text ("...Successfully"), not JSON — without responseType 'text'
+  // Angular fails to parse it and reports an error even though the order WAS cancelled.
+  cancelOrder(orderId: number): Observable<string> {
+    return this.http.post(`${this.baseUrl}/CancelOrder/${orderId}`, {}, { responseType: 'text' });
+  }
+
+  // PUT api/Order/{orderId}  (Admin)
+  updateOrder(orderId: number, payload: UpdateOrderPayload): Observable<OrderToReturn> {
+    return this.http.put<OrderToReturn>(`${this.baseUrl}/${orderId}`, payload);
   }
 }
