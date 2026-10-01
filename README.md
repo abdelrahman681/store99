@@ -12,12 +12,6 @@ npm install
 npm start
 ```
 
-قبل التشغيل، حدّث الـ Base URL بتاع الـ API في:
-`src/environments/environment.development.ts` و `environment.ts`
-```ts
-apiUrl: 'https://localhost:7001/api'   // غيّرها لبورت الـ API عندك
-```
-
 ## الهيكل
 
 ```
