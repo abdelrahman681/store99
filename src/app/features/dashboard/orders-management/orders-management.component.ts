@@ -52,7 +52,7 @@ export class OrdersManagementComponent implements OnInit {
     lName: ['', Validators.required],
     street: ['', Validators.required],
     city: ['', Validators.required],
-    country: ['', Validators.required],
+    government: ['', Validators.required],
     deliveryMethodId: [0, [Validators.required, Validators.min(1)]]
   });
 
@@ -96,7 +96,7 @@ export class OrdersManagementComponent implements OnInit {
       lName: o.address?.lName ?? '',
       street: o.address?.street ?? '',
       city: o.address?.city ?? '',
-      country: o.address?.country ?? '',
+      government: o.address?.government ?? '',
       deliveryMethodId: method?.id ?? 0
     });
     setTimeout(() => document.getElementById('order-edit')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
