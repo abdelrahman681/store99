@@ -399,4 +399,37 @@ export class OrdersManagementComponent implements OnInit {
 
   }
 
+
+viewOrder(orderId: number): void {
+
+  this.orderService
+    .getOrderById02(orderId)
+    .subscribe({
+
+      next: order => {
+
+        console.log('Order:', order);
+
+        // هنا مؤقتًا نشوف الداتا
+        // وبعدها نعرضها في Modal أو Panel
+
+      },
+
+      error: (err: any) => {
+
+        this.toast.error(
+          apiErrorMessage(
+            err,
+            'تعذر تحميل بيانات الطلب'
+          )
+        );
+
+      }
+
+    });
+
+}
+
+
+
 }

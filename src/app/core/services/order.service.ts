@@ -108,5 +108,19 @@ export class OrderService {
     );
 
   }
+getOrderById02(
+  orderId: number
+): Observable<OrderToReturn> {
+
+  const params = new HttpParams()
+    .set('Id', orderId);
+
+  return this.http.get<OrderToReturn>(
+    `${this.baseUrl}/GetOrderById`,
+    { params }
+  );
+
+}
+
 
 }
