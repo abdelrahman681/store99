@@ -41,5 +41,21 @@ updateOrder(
   );
 }
 
+getOrders(
+  pageIndex: number = 1,
+  pageSize: number = 10
+): Observable<Pagination<OrderToReturn>> {
+  return this.http.get<Pagination<OrderToReturn>>(
+    `${this.baseUrl}/Order/GetOrders`,
+    {
+      params: {
+        pageIndex,
+        pageSize
+      }
+    }
+  );
+}
+
+
 
 }

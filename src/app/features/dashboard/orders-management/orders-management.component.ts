@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import {
-FormBuilder,
-ReactiveFormsModule,
-Validators
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
@@ -17,406 +17,386 @@ import { ToastService } from '../../../core/services/toast.service';
 
 import { apiErrorMessage } from '../../../core/utils/api-error';
 import {
-orderStatusClass,
-orderStatusLabel
+  orderStatusClass,
+  orderStatusLabel
 } from '../../../core/utils/order-status';
 
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
-selector: 'app-orders-management',
-standalone: true,
-imports: [
-CommonModule,
-ReactiveFormsModule,
-RouterLink,
-PaginationComponent
-],
-templateUrl: './orders-management.component.html'
+  selector: 'app-orders-management',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    PaginationComponent
+  ],
+  templateUrl: './orders-management.component.html'
 })
 export class OrdersManagementComponent implements OnInit {
 
-private fb = inject(FormBuilder);
-private orderService = inject(OrderService);
-private basketService = inject(BasketService);
-private toast = inject(ToastService);
-private confirmService = inject(ConfirmService);
+  private fb = inject(FormBuilder);
+  private orderService = inject(OrderService);
+  private basketService = inject(BasketService);
+  private toast = inject(ToastService);
+  private confirmService = inject(ConfirmService);
 
-statusLabel = orderStatusLabel;
-statusClass = orderStatusClass;
+  statusLabel = orderStatusLabel;
+  statusClass = orderStatusClass;
 
-orderStatuses = [
-{ value: 0, label: 'قيد الانتظار' },
-{ value: 1, label: 'تم الدفع' },
-{ value: 2, label: 'فشل الدفع' },
-{ value: 3, label: 'ملغي' },
-{ value: 4, label: 'تم التسليم' }
-];
+  orderStatuses = [
+    { value: 0, label: 'قيد الانتظار' },
+    { value: 1, label: 'تم الدفع' },
+    { value: 2, label: 'فشل الدفع' },
+    { value: 3, label: 'ملغي' },
+    { value: 4, label: 'تم التسليم' }
+  ];
 
-orders: OrderToReturn[] = [];
+  orders: OrderToReturn[] = [];
 
-loading = true;
+  loading = true;
 
-pageIndex = 1;
-totalPages = 0;
+  pageIndex = 1;
+  totalPages = 0;
 
-readonly pageSize = 10;
+  readonly pageSize = 10;
 
-deliveryMethods: DeliveryMethodDTO[] = [];
+  deliveryMethods: DeliveryMethodDTO[] = [];
 
-editing: OrderToReturn | null = null;
+  editing: OrderToReturn | null = null;
 
-saving = false;
+  saving = false;
 
-form = this.fb.nonNullable.group({
+  form = this.fb.nonNullable.group({
 
+    fName: [
+      '',
+      Validators.required
+    ],
 
-fName: [
-  '',
-  Validators.required
-],
+    lName: [
+      '',
+      Validators.required
+    ],
 
-lName: [
-  '',
-  Validators.required
-],
+    street: [
+      '',
+      Validators.required
+    ],
 
-street: [
-  '',
-  Validators.required
-],
+    city: [
+      '',
+      Validators.required
+    ],
 
-city: [
-  '',
-  Validators.required
-],
+    government: [
+      '',
+      Validators.required
+    ],
 
-government: [
-  '',
-  Validators.required
-],
+    deliveryMethodId: [
+      0,
+      [
+        Validators.required,
+        Validators.min(1)
+      ]
+    ],
 
-deliveryMethodId: [
-  0,
-  [
-    Validators.required,
-    Validators.min(1)
-  ]
-],
-
-status: [
-  0,
-  Validators.required
-]
-
-
-});
-
-ngOnInit(): void {
-
-
-this.load(1);
-
-this.loadDeliveryMethods();
-
-
-}
-
-loadDeliveryMethods(): void {
-
-
-this.basketService
-  .getDeliveryMethods()
-  .subscribe({
-
-    next: methods => {
-
-      this.deliveryMethods =
-        Array.isArray(methods)
-          ? methods
-          : [];
-
-    },
-
-    error: () => {
-
-      this.toast.error(
-        'تعذر تحميل طرق الشحن'
-      );
-
-    }
+    status: [
+      0,
+      Validators.required
+    ]
 
   });
 
+  ngOnInit(): void {
 
-}
+    this.load(1);
 
-load(page: number): void {
+    this.loadDeliveryMethods();
 
+  }
 
-this.loading = true;
+  loadDeliveryMethods(): void {
 
-this.orderService
-  .getOrdersForUser(
-    page,
-    this.pageSize
-  )
-  .subscribe({
+    this.basketService
+      .getDeliveryMethods()
+      .subscribe({
 
-    next: res => {
+        next: methods => {
 
-      this.orders =
-        res.data ?? [];
+          this.deliveryMethods =
+            Array.isArray(methods)
+              ? methods
+              : [];
 
-      this.pageIndex =
-        res.pageIndex ?? page;
+        },
 
-      this.totalPages =
-        res.totalPages ?? 0;
+        error: () => {
 
-      this.loading = false;
+          this.toast.error(
+            'تعذر تحميل طرق الشحن'
+          );
 
-    },
+        }
 
-    error: () => {
+      });
 
-      this.loading = false;
+  }
 
-      this.toast.error(
-        'تعذر تحميل الطلبات'
-      );
+  load(page: number): void {
+
+    this.loading = true;
+
+    this.orderService
+      .getOrders(
+        page,
+        this.pageSize
+      )
+      .subscribe({
+
+        next: res => {
+
+          this.orders =
+            res.data ?? [];
+
+          this.pageIndex =
+            res.pageIndex ?? page;
+
+          this.totalPages =
+            res.totalPages ?? 0;
+
+          this.loading = false;
+
+        },
+
+        error: () => {
+
+          this.loading = false;
+
+          this.toast.error(
+            'تعذر تحميل الطلبات'
+          );
+
+        }
+
+      });
+
+  }
+
+  canEdit(
+    o: OrderToReturn
+  ): boolean {
+
+    return true;
+
+  }
+
+  getStatusValue(
+    status: string | number
+  ): number {
+
+    if (
+      typeof status === 'number'
+    ) {
+
+      return status;
 
     }
 
-  });
+    const map: Record<string, number> = {
 
+      pending: 0,
 
-}
+      paymentsuccssed: 1,
 
-canEdit(
-o: OrderToReturn
-): boolean {
+      paymentfailed: 2,
 
+      cancelled: 3,
 
-return true;
+      delivered: 4
 
+    };
 
-}
+    return (
+      map[
+        status.toLowerCase()
+      ] ?? 0
+    );
 
-getStatusValue(
-status: string | number
-): number {
+  }
 
+  startEdit(
+    o: OrderToReturn
+  ): void {
 
-if (
-  typeof status === 'number'
-) {
+    this.editing = o;
 
-  return status;
+    const method =
+      this.deliveryMethods.find(
+        m =>
+          m.shortName ===
+          o.deliveryMethod
+      );
 
-}
+    this.form.reset({
 
-const map: Record<string, number> = {
+      fName:
+        o.address?.fName ?? '',
 
-  pending: 0,
+      lName:
+        o.address?.lName ?? '',
 
-  paymentsuccssed: 1,
+      street:
+        o.address?.street ?? '',
 
-  paymentfailed: 2,
+      city:
+        o.address?.city ?? '',
 
-  cancelled: 3,
+      government:
+        o.address?.government ?? '',
 
-  delivered: 4
+      deliveryMethodId:
+        method?.id ?? 0,
 
-};
-
-return (
-  map[
-    status.toLowerCase()
-  ] ?? 0
-);
-
-
-}
-
-startEdit(
-o: OrderToReturn
-): void {
-
-
-this.editing = o;
-
-const method =
-  this.deliveryMethods.find(
-    m =>
-      m.shortName ===
-      o.deliveryMethod
-  );
-
-this.form.reset({
-
-  fName:
-    o.address?.fName ?? '',
-
-  lName:
-    o.address?.lName ?? '',
-
-  street:
-    o.address?.street ?? '',
-
-  city:
-    o.address?.city ?? '',
-
-  government:
-    o.address?.government ?? '',
-
-  deliveryMethodId:
-    method?.id ?? 0,
-
-  status:
-    this.getStatusValue(
-      o.status
-    )
-
-});
-
-setTimeout(() => {
-
-  document
-    .getElementById(
-      'order-edit'
-    )
-    ?.scrollIntoView({
-
-      behavior: 'smooth',
-
-      block: 'start'
+      status:
+        this.getStatusValue(
+          o.status
+        )
 
     });
 
-});
+    setTimeout(() => {
 
-
-}
-
-cancelEdit(): void {
-
-
-this.editing = null;
-
-
-}
-
-async save(): Promise<void> {
-
-
-const order =
-  this.editing;
-
-if (!order) {
-
-  return;
-
-}
-
-
-if (this.form.invalid) {
-
-  this.form.markAllAsTouched();
-
-  this.toast.warning(
-    'من فضلك املأ كل البيانات واختر طريقة الشحن والحالة'
-  );
-
-  return;
-
-}
-
-
-const ok =
-  await this.confirmService.ask({
-
-    title: 'تعديل الطلب',
-
-    message:
-      `هيتم تعديل الطلب #${order.id} ` +
-      `وتحديث بيانات العنوان وطريقة الشحن وحالة الطلب. متأكد؟`,
-
-    confirmText:
-      'نعم، عدّل الطلب'
-
-  });
-
-
-if (!ok) {
-
-  return;
-
-}
-
-
-const {
-  deliveryMethodId,
-  status,
-  ...address
-} =
-  this.form.getRawValue();
-
-
-this.saving = true;
-
-
-this.orderService
-  .updateOrder(
-
-    order.id,
-
-    {
-
-      shippingAddress:
-        address,
-
-      deliveryMethodId,
-
-      status
-
-    }
-
-  )
-  .subscribe({
-
-    next: () => {
-
-      this.saving = false;
-
-      this.editing = null;
-
-      this.toast.success(
-        'تم تعديل الطلب بنجاح ✅'
-      );
-
-      this.load(
-        this.pageIndex
-      );
-
-    },
-
-    error: err => {
-
-      this.saving = false;
-
-      this.toast.error(
-        apiErrorMessage(
-          err,
-          'تعذر تعديل الطلب'
+      document
+        .getElementById(
+          'order-edit'
         )
-      );
+        ?.scrollIntoView({
+
+          behavior: 'smooth',
+
+          block: 'start'
+
+        });
+
+    });
+
+  }
+
+  cancelEdit(): void {
+
+    this.editing = null;
+
+  }
+
+  async save(): Promise<void> {
+
+    const order =
+      this.editing;
+
+    if (!order) {
+
+      return;
 
     }
 
-  });
+    if (this.form.invalid) {
 
+      this.form.markAllAsTouched();
 
-}
+      this.toast.warning(
+        'من فضلك املأ كل البيانات واختر طريقة الشحن والحالة'
+      );
+
+      return;
+
+    }
+
+    const ok =
+      await this.confirmService.ask({
+
+        title: 'تعديل الطلب',
+
+        message:
+          `هيتم تعديل الطلب #${order.id} ` +
+          `وتحديث بيانات العنوان وطريقة الشحن وحالة الطلب. متأكد؟`,
+
+        confirmText:
+          'نعم، عدّل الطلب'
+
+      });
+
+    if (!ok) {
+
+      return;
+
+    }
+
+    const {
+      deliveryMethodId,
+      status,
+      ...address
+    } = this.form.getRawValue();
+
+    this.saving = true;
+
+    this.orderService
+      .updateOrder(
+
+        order.id,
+
+        {
+
+          shippingAddress:
+            address,
+
+          deliveryMethodId,
+
+          status
+
+        }
+
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.saving = false;
+
+          this.editing = null;
+
+          this.toast.success(
+            'تم تعديل الطلب بنجاح ✅'
+          );
+
+          this.load(
+            this.pageIndex
+          );
+
+        },
+
+        error: (err: any) => {
+
+          this.saving = false;
+
+          this.toast.error(
+
+            apiErrorMessage(
+
+              err,
+
+              'تعذر تعديل الطلب'
+
+            )
+
+          );
+
+        }
+
+      });
+
+  }
 
 }
