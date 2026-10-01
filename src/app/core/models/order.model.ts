@@ -34,7 +34,6 @@ export interface OrderToReturn {
 
 export interface UpdateOrderPayload {
   shippingAddress: ShippingAddress;
-  basketId: string;
   deliveryMethodId: number;
   status: number;
 }

@@ -1,1 +1,94 @@
 /* toast styling now lives in the global ToastService */
+.dashboard-layout {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 24px;
+  align-items: flex-start;
+  width: 100%;
+}
+.dashboard-sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 700;
+  padding: 8px 10px 16px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  padding: 12px 14px;
+
+  color: #495057;
+  background: transparent;
+
+  border-radius: 10px;
+  text-decoration: none;
+
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: #f1f3f5;
+  color: #0d6efd;
+}
+
+.sidebar-link i {
+  width: 22px;
+  text-align: center;
+  font-size: 17px;
+}
+
+.sidebar-link span {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+}
+
+
+/* Mobile */
+@media (max-width: 768px) {
+
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .dashboard-sidebar {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .sidebar-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .sidebar-link {
+    width: auto;
+    flex: 1 1 45%;
+  }
+
+}

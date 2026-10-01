@@ -30,7 +30,16 @@ export class OrderService {
   }
 
   // PUT api/Order/{orderId}  (Admin)
-  updateOrder(orderId: number, payload: UpdateOrderPayload): Observable<OrderToReturn> {
-    return this.http.put<OrderToReturn>(`${this.baseUrl}/${orderId}`, payload);
-  }
+
+updateOrder(
+  orderId: number,
+  payload: UpdateOrderPayload
+): Observable<OrderToReturn> {
+  return this.http.put<OrderToReturn>(
+    `${this.baseUrl}/Order/${orderId}`,
+    payload
+  );
+}
+
+
 }

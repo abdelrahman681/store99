@@ -5,14 +5,13 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 
 import { ProductService } from '../../core/services/product.service';
 import { BrandService } from '../../core/services/brandservice.service';
 import { CategoryService } from '../../core/services/categoryservice.service';
-
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Brand } from '../../core/models/brand.model';
 import { Category } from '../../core/models/category.model';
 import { Product } from '../../core/models/product.model';
@@ -22,7 +21,8 @@ import { Product } from '../../core/models/product.model';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    RouterLinkActive
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'

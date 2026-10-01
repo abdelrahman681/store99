@@ -1,40 +1,61 @@
 <div>
 
+  <!-- Dashboard Header -->
+
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="mb-1">Admin Dashboard</h2>
       <p class="text-muted mb-0">إضافة منتج جديد</p>
     </div>
-
-<div class="d-flex gap-2 flex-wrap">
-
-  <a routerLink="/products" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-1"></i>
-    المنتجات
-  </a>
-
-  <a routerLink="/dashboard/products" class="btn btn-primary">
-    <i class="bi bi-box-seam me-1"></i>
-    إدارة المنتجات
-  </a>
-  <a routerLink="/dashboard/orders" class="btn btn-outline-primary">
-    <i class="bi bi-receipt me-1"></i>
-    تعديل الطلبات
-  </a>
-  <a routerLink="/dashboard/users" class="btn btn-outline-primary">
-    <i class="bi bi-people me-1"></i>
-    المستخدمين
-  </a>
-  <a routerLink="/dashboard/roles" class="btn btn-outline-primary">
-    <i class="bi bi-shield-lock me-1"></i>
-    الأدوار
-  </a>
-
-</div>
   </div>
 
+  <!-- Dashboard Layout -->
+
+  <div class="dashboard-layout">
 
 
+<!-- Side Navbar -->
+<aside class="dashboard-sidebar">
+
+  <div class="sidebar-title">
+    <i class="bi bi-speedometer2 me-2"></i>
+    Admin Panel
+  </div>
+
+  <div class="sidebar-links">
+
+    <a routerLink="/products" class="sidebar-link">
+      <i class="bi bi-arrow-left"></i>
+      <span>المنتجات</span>
+    </a>
+
+    <a routerLink="/dashboard/products" class="sidebar-link">
+      <i class="bi bi-box-seam"></i>
+      <span>إدارة المنتجات</span>
+    </a>
+
+    <a routerLink="/dashboard/orders" class="sidebar-link">
+      <i class="bi bi-receipt"></i>
+      <span>تعديل الطلبات</span>
+    </a>
+
+    <a routerLink="/dashboard/users" class="sidebar-link">
+      <i class="bi bi-people"></i>
+      <span>المستخدمين</span>
+    </a>
+
+    <a routerLink="/dashboard/roles" class="sidebar-link">
+      <i class="bi bi-shield-lock"></i>
+      <span>الأدوار</span>
+    </a>
+
+  </div>
+
+</aside>
+
+
+<!-- Main Content -->
+<main class="dashboard-main">
 
   <!-- Add Product -->
   <div class="card shadow-sm">
@@ -253,8 +274,9 @@
 
   </div>
 
+</main>
 
-  <!-- Products List -->
 
+  </div>
 
 </div>
