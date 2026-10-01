@@ -68,6 +68,18 @@ export class OrdersManagementComponent implements OnInit {
 
   saving = false;
 
+  // =========================
+  // View Order
+  // =========================
+
+  viewingOrder: OrderToReturn | null = null;
+
+  viewingLoading = false;
+
+  // =========================
+  // Edit Form
+  // =========================
+
   form = this.fb.nonNullable.group({
 
     fName: [
@@ -118,6 +130,10 @@ export class OrdersManagementComponent implements OnInit {
 
   }
 
+  // =========================
+  // Load Delivery Methods
+  // =========================
+
   loadDeliveryMethods(): void {
 
     this.basketService
@@ -144,6 +160,10 @@ export class OrdersManagementComponent implements OnInit {
       });
 
   }
+
+  // =========================
+  // Load Orders
+  // =========================
 
   load(page: number): void {
 
@@ -184,6 +204,66 @@ export class OrdersManagementComponent implements OnInit {
       });
 
   }
+
+  // =========================
+  // View Order
+  // =========================
+
+  viewOrder(orderId: number): void {
+
+    this.viewingLoading = true;
+
+    this.viewingOrder = null;
+
+    this.orderService
+      .getOrderById02(orderId)
+      .subscribe({
+
+        next: order => {
+
+          this.viewingOrder = order;
+
+          this.viewingLoading = false;
+
+          setTimeout(() => {
+
+            document
+              .getElementById('order-view')
+              ?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+
+          });
+
+        },
+
+        error: (err: any) => {
+
+          this.viewingLoading = false;
+
+          this.toast.error(
+            apiErrorMessage(
+              err,
+              'تعذر تحميل بيانات الطلب'
+            )
+          );
+
+        }
+
+      });
+
+  }
+
+  closeView(): void {
+
+    this.viewingOrder = null;
+
+  }
+
+  // =========================
+  // Edit
+  // =========================
 
   canEdit(
     o: OrderToReturn
@@ -291,6 +371,10 @@ export class OrdersManagementComponent implements OnInit {
 
   }
 
+  // =========================
+  // Save Edit
+  // =========================
+
   async save(): Promise<void> {
 
     const order =
@@ -361,11 +445,14 @@ export class OrdersManagementComponent implements OnInit {
       )
       .subscribe({
 
-        next: () => {
+        next: updatedOrder => {
 
           this.saving = false;
 
           this.editing = null;
+
+          this.viewingOrder =
+            updatedOrder;
 
           this.toast.success(
             'تم تعديل الطلب بنجاح ✅'
@@ -398,38 +485,5 @@ export class OrdersManagementComponent implements OnInit {
       });
 
   }
-
-
-viewOrder(orderId: number): void {
-
-  this.orderService
-    .getOrderById02(orderId)
-    .subscribe({
-
-      next: order => {
-
-        console.log('Order:', order);
-
-        // هنا مؤقتًا نشوف الداتا
-        // وبعدها نعرضها في Modal أو Panel
-
-      },
-
-      error: (err: any) => {
-
-        this.toast.error(
-          apiErrorMessage(
-            err,
-            'تعذر تحميل بيانات الطلب'
-          )
-        );
-
-      }
-
-    });
-
-}
-
-
 
 }

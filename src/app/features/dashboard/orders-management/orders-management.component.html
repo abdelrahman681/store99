@@ -2,36 +2,293 @@
 
   <div>
 
+    <h1 class="page-title">
+      <i class="bi bi-receipt"></i>
+      إدارة الطلبات
+    </h1>
 
-<h1 class="page-title">
-  <i class="bi bi-receipt"></i>
-  تعديل الطلبات
-</h1>
-
-<p class="text-muted mb-0 small">
-  يمكنك تعديل بيانات الطلب وحالة الطلب من لوحة التحكم
-</p>
-
+    <p class="text-muted mb-0 small">
+      يمكنك عرض وتعديل بيانات الطلبات من لوحة التحكم
+    </p>
 
   </div>
 
-<a
-routerLink="/dashboard"
-class="btn btn-outline-secondary"
+  <a
+    routerLink="/dashboard"
+    class="btn btn-outline-secondary"
+  >
 
->
+    <i class="bi bi-arrow-right me-1"></i>
 
-
-<i class="bi bi-arrow-right me-1"></i>
-
-لوحة التحكم
-
+    لوحة التحكم
 
   </a>
 
 </div>
 
+
+<!-- ========================= -->
+<!-- View Order -->
+<!-- ========================= -->
+
+@if (viewingLoading) {
+
+  <div
+    class="surface p-4 mb-4 text-center"
+  >
+
+    <div
+      class="spinner-border"
+      role="status"
+    ></div>
+
+    <div class="text-muted mt-2">
+      جاري تحميل بيانات الطلب...
+    </div>
+
+  </div>
+
+}
+
+@if (viewingOrder; as order) {
+
+  <div
+    id="order-view"
+    class="surface p-3 p-md-4 mb-4"
+  >
+
+    <!-- Header -->
+
+    <div
+      class="d-flex justify-content-between align-items-center mb-3"
+    >
+
+      <div>
+
+        <h5 class="mb-1">
+          تفاصيل الطلب #{{ order.id }}
+        </h5>
+
+        <div class="text-muted small">
+
+          {{
+            order.dateOfCreate
+              | date:'dd/MM/yyyy - h:mm a':'':'ar-EG'
+          }}
+
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        (click)="closeView()"
+      >
+
+        إغلاق
+
+      </button>
+
+    </div>
+
+
+    <!-- Order Info -->
+
+    <div class="row g-3">
+
+      <!-- Status -->
+
+      <div class="col-12 col-md-4">
+
+        <div class="border rounded p-3 h-100">
+
+          <div class="text-muted small mb-1">
+            حالة الطلب
+          </div>
+
+          <span
+            [class]="statusClass(order.status)"
+          >
+            {{ statusLabel(order.status) }}
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Delivery -->
+
+      <div class="col-12 col-md-4">
+
+        <div class="border rounded p-3 h-100">
+
+          <div class="text-muted small mb-1">
+            طريقة الشحن
+          </div>
+
+          <div class="fw-semibold">
+            {{ order.deliveryMethod }}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Total -->
+
+      <div class="col-12 col-md-4">
+
+        <div class="border rounded p-3 h-100">
+
+          <div class="text-muted small mb-1">
+            إجمالي الطلب
+          </div>
+
+          <div class="price fs-5 fw-bold">
+            {{ order.total | number:'1.0-2' }}
+            ج.م
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Customer -->
+
+      <div class="col-12">
+
+        <div class="border rounded p-3">
+
+          <h6 class="mb-3">
+            <i class="bi bi-person me-1"></i>
+            بيانات العميل
+          </h6>
+
+          <div class="row g-3">
+
+            <div class="col-12 col-md-6">
+
+              <div class="text-muted small">
+                الاسم
+              </div>
+
+              <div class="fw-semibold">
+                {{ order.address.fName }}
+                {{ order.address.lName }}
+              </div>
+
+            </div>
+
+            <div class="col-12 col-md-6">
+
+              <div class="text-muted small">
+                المحافظة
+              </div>
+
+              <div class="fw-semibold">
+                {{ order.address.government }}
+              </div>
+
+            </div>
+
+            <div class="col-12 col-md-6">
+
+              <div class="text-muted small">
+                المدينة
+              </div>
+
+              <div class="fw-semibold">
+                {{ order.address.city }}
+              </div>
+
+            </div>
+
+            <div class="col-12 col-md-6">
+
+              <div class="text-muted small">
+                الشارع
+              </div>
+
+              <div class="fw-semibold">
+                {{ order.address.street }}
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Items -->
+
+      @if (order.items.length) {
+
+        <div class="col-12">
+
+          <div class="border rounded p-3">
+
+            <h6 class="mb-3">
+              <i class="bi bi-bag me-1"></i>
+              منتجات الطلب
+            </h6>
+
+            <div class="d-grid gap-2">
+
+              @for (
+                item of order.items;
+                track $index
+              ) {
+
+                <div
+                  class="d-flex justify-content-between align-items-center border-bottom pb-2"
+                >
+
+                  <div>
+
+                    <div class="fw-semibold">
+                      {{ item.productName }}
+                    </div>
+
+                    <div class="text-muted small">
+                      الكمية: {{ item.quantity }}
+                    </div>
+
+                  </div>
+
+                  <div class="fw-semibold">
+                    {{ item.price | number:'1.0-2' }}
+                    ج.م
+                  </div>
+
+                </div>
+
+              }
+
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </div>
+
+}
+
+
+<!-- ========================= -->
 <!-- Edit Panel -->
+<!-- ========================= -->
 
 @if (editing; as o) {
 
@@ -40,329 +297,329 @@ class="btn btn-outline-secondary"
     class="surface p-3 p-md-4 mb-4"
   >
 
-
-<div
-  class="d-flex justify-content-between align-items-center mb-3"
->
-
-  <h5 class="mb-0">
-    تعديل الطلب #{{ o.id }}
-  </h5>
-
-
-  <button
-    type="button"
-    class="btn btn-sm btn-outline-secondary"
-    (click)="cancelEdit()"
-  >
-
-    إغلاق
-
-  </button>
-
-</div>
-
-
-<form
-  [formGroup]="form"
-  (ngSubmit)="save()"
-  novalidate
->
-
-  <div class="row g-3">
-
-
-    <!-- First Name -->
-    <div class="col-6 col-md-3">
-
-      <label
-        class="form-label"
-        for="fName"
-      >
-        الاسم الأول
-      </label>
-
-
-      <input
-        id="fName"
-        class="form-control"
-        formControlName="fName"
-        [class.is-invalid]="
-          form.controls.fName.touched &&
-          form.controls.fName.invalid
-        "
-      >
-
-    </div>
-
-
-    <!-- Last Name -->
-    <div class="col-6 col-md-3">
-
-      <label
-        class="form-label"
-        for="lName"
-      >
-        اسم العائلة
-      </label>
-
-
-      <input
-        id="lName"
-        class="form-control"
-        formControlName="lName"
-        [class.is-invalid]="
-          form.controls.lName.touched &&
-          form.controls.lName.invalid
-        "
-      >
-
-    </div>
-
-
-    <!-- Street -->
-    <div class="col-12 col-md-6">
-
-      <label
-        class="form-label"
-        for="street"
-      >
-        الشارع
-      </label>
-
-
-      <input
-        id="street"
-        class="form-control"
-        formControlName="street"
-        [class.is-invalid]="
-          form.controls.street.touched &&
-          form.controls.street.invalid
-        "
-      >
-
-    </div>
-
-
-    <!-- City -->
-    <div class="col-6 col-md-3">
-
-      <label
-        class="form-label"
-        for="city"
-      >
-        المدينة
-      </label>
-
-
-      <input
-        id="city"
-        class="form-control"
-        formControlName="city"
-        [class.is-invalid]="
-          form.controls.city.touched &&
-          form.controls.city.invalid
-        "
-      >
-
-    </div>
-
-
-    <!-- Government -->
-    <div class="col-6 col-md-3">
-
-      <label
-        class="form-label"
-        for="government"
-      >
-        المحافظة
-      </label>
-
-
-      <input
-        id="government"
-        class="form-control"
-        formControlName="government"
-        [class.is-invalid]="
-          form.controls.government.touched &&
-          form.controls.government.invalid
-        "
-      >
-
-    </div>
-
-
-    <!-- Delivery Method -->
-    <div class="col-12 col-md-6">
-
-      <label
-        class="form-label"
-        for="delivery"
-      >
-        طريقة الشحن
-      </label>
-
-
-      <select
-        id="delivery"
-        class="form-select"
-        formControlName="deliveryMethodId"
-        [class.is-invalid]="
-          form.controls.deliveryMethodId.touched &&
-          form.controls.deliveryMethodId.invalid
-        "
-      >
-
-        <option [ngValue]="0">
-          اختر طريقة الشحن
-        </option>
-
-
-        @for (
-          m of deliveryMethods;
-          track m.id
-        ) {
-
-          <option
-            [ngValue]="m.id"
-          >
-
-            {{ m.shortName }}
-
-            —
-
-            {{ m.cost | number:'1.0-2' }}
-
-            ج.م
-
-            ({{ m.deliveryTime }})
-
-          </option>
-
-        }
-
-      </select>
-
-    </div>
-
-
-    <!-- Status -->
-    <div class="col-12 col-md-6">
-
-      <label
-        class="form-label"
-        for="status"
-      >
-        حالة الطلب
-      </label>
-
-
-      <select
-        id="status"
-        class="form-select"
-        formControlName="status"
-      >
-
-        @for (
-          s of orderStatuses;
-          track s.value
-        ) {
-
-          <option
-            [ngValue]="s.value"
-          >
-
-            {{ s.label }}
-
-          </option>
-
-        }
-
-      </select>
-
-    </div>
-
-  </div>
-
-
-  <!-- Info -->
-  <div
-    class="alert alert-info mt-3 mb-0 small"
-  >
-
-    <i class="bi bi-info-circle me-1"></i>
-
-    سيتم تعديل بيانات العنوان وطريقة الشحن وحالة الطلب فقط،
-    ولن يتم تغيير منتجات الطلب.
-
-  </div>
-
-
-  <!-- Buttons -->
-  <div class="d-flex gap-2 mt-3">
-
-    <button
-      type="submit"
-      class="btn btn-primary"
-      [disabled]="saving"
+    <div
+      class="d-flex justify-content-between align-items-center mb-3"
     >
 
-      @if (saving) {
+      <h5 class="mb-0">
+        تعديل الطلب #{{ o.id }}
+      </h5>
 
-        <span
-          class="spinner-border spinner-border-sm me-2"
-        ></span>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        (click)="cancelEdit()"
+      >
+        إغلاق
+      </button>
 
-      }
-
-      حفظ التعديل
-
-    </button>
+    </div>
 
 
-    <button
-      type="button"
-      class="btn btn-outline-secondary"
-      (click)="cancelEdit()"
+    <form
+      [formGroup]="form"
+      (ngSubmit)="save()"
+      novalidate
     >
 
-      إلغاء
+      <div class="row g-3">
 
-    </button>
 
-  </div>
+        <!-- First Name -->
 
-</form>
+        <div class="col-6 col-md-3">
 
+          <label
+            class="form-label"
+            for="fName"
+          >
+            الاسم الأول
+          </label>
+
+          <input
+            id="fName"
+            class="form-control"
+            formControlName="fName"
+            [class.is-invalid]="
+              form.controls.fName.touched &&
+              form.controls.fName.invalid
+            "
+          >
+
+        </div>
+
+
+        <!-- Last Name -->
+
+        <div class="col-6 col-md-3">
+
+          <label
+            class="form-label"
+            for="lName"
+          >
+            اسم العائلة
+          </label>
+
+          <input
+            id="lName"
+            class="form-control"
+            formControlName="lName"
+            [class.is-invalid]="
+              form.controls.lName.touched &&
+              form.controls.lName.invalid
+            "
+          >
+
+        </div>
+
+
+        <!-- Street -->
+
+        <div class="col-12 col-md-6">
+
+          <label
+            class="form-label"
+            for="street"
+          >
+            الشارع
+          </label>
+
+          <input
+            id="street"
+            class="form-control"
+            formControlName="street"
+            [class.is-invalid]="
+              form.controls.street.touched &&
+              form.controls.street.invalid
+            "
+          >
+
+        </div>
+
+
+        <!-- City -->
+
+        <div class="col-6 col-md-3">
+
+          <label
+            class="form-label"
+            for="city"
+          >
+            المدينة
+          </label>
+
+          <input
+            id="city"
+            class="form-control"
+            formControlName="city"
+            [class.is-invalid]="
+              form.controls.city.touched &&
+              form.controls.city.invalid
+            "
+          >
+
+        </div>
+
+
+        <!-- Government -->
+
+        <div class="col-6 col-md-3">
+
+          <label
+            class="form-label"
+            for="government"
+          >
+            المحافظة
+          </label>
+
+          <input
+            id="government"
+            class="form-control"
+            formControlName="government"
+            [class.is-invalid]="
+              form.controls.government.touched &&
+              form.controls.government.invalid
+            "
+          >
+
+        </div>
+
+
+        <!-- Delivery Method -->
+
+        <div class="col-12 col-md-6">
+
+          <label
+            class="form-label"
+            for="delivery"
+          >
+            طريقة الشحن
+          </label>
+
+          <select
+            id="delivery"
+            class="form-select"
+            formControlName="deliveryMethodId"
+            [class.is-invalid]="
+              form.controls.deliveryMethodId.touched &&
+              form.controls.deliveryMethodId.invalid
+            "
+          >
+
+            <option [ngValue]="0">
+              اختر طريقة الشحن
+            </option>
+
+            @for (
+              m of deliveryMethods;
+              track m.id
+            ) {
+
+              <option
+                [ngValue]="m.id"
+              >
+
+                {{ m.shortName }}
+
+                —
+
+                {{ m.cost | number:'1.0-2' }}
+
+                ج.م
+
+                ({{ m.deliveryTime }})
+
+              </option>
+
+            }
+
+          </select>
+
+        </div>
+
+
+        <!-- Status -->
+
+        <div class="col-12 col-md-6">
+
+          <label
+            class="form-label"
+            for="status"
+          >
+            حالة الطلب
+          </label>
+
+          <select
+            id="status"
+            class="form-select"
+            formControlName="status"
+          >
+
+            @for (
+              s of orderStatuses;
+              track s.value
+            ) {
+
+              <option
+                [ngValue]="s.value"
+              >
+
+                {{ s.label }}
+
+              </option>
+
+            }
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- Info -->
+
+      <div
+        class="alert alert-info mt-3 mb-0 small"
+      >
+
+        <i class="bi bi-info-circle me-1"></i>
+
+        سيتم تعديل بيانات العنوان وطريقة الشحن وحالة الطلب فقط،
+        ولن يتم تغيير منتجات الطلب.
+
+      </div>
+
+
+      <!-- Buttons -->
+
+      <div class="d-flex gap-2 mt-3">
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="saving"
+        >
+
+          @if (saving) {
+
+            <span
+              class="spinner-border spinner-border-sm me-2"
+            ></span>
+
+          }
+
+          حفظ التعديل
+
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="cancelEdit()"
+        >
+
+          إلغاء
+
+        </button>
+
+      </div>
+
+    </form>
 
   </div>
 
 }
 
+
+<!-- ========================= -->
 <!-- Loading -->
+<!-- ========================= -->
 
 @if (loading) {
 
-@for (
-i of [1, 2, 3];
-track i
-) {
+  @for (
+    i of [1, 2, 3];
+    track i
+  ) {
 
+    <div
+      class="skeleton mb-2"
+      style="
+        height: 64px;
+        border-radius: 14px;
+      "
+    ></div>
 
-<div
-  class="skeleton mb-2"
-  style="
-    height: 64px;
-    border-radius: 14px;
-  "
-></div>
-
-
-}
+  }
 
 }
 
+
+<!-- ========================= -->
 <!-- Empty -->
+<!-- ========================= -->
 
 @else if (orders.length === 0) {
 
@@ -370,153 +627,174 @@ track i
     class="empty-state surface"
   >
 
+    <i class="bi bi-bag-x"></i>
 
-<i class="bi bi-bag-x"></i>
-
-<h5>
-  لا توجد طلبات
-</h5>
-
+    <h5>
+      لا توجد طلبات
+    </h5>
 
   </div>
 
 }
 
+
+<!-- ========================= -->
 <!-- Orders -->
+<!-- ========================= -->
 
 @else {
 
   <div class="d-grid gap-2">
 
+    @for (
+      o of orders;
+      track o.id
+    ) {
 
-@for (
-  o of orders;
-  track o.id
-) {
-
-  <div class="surface order-card">
-
-
-    <!-- Header -->
-    <div
-      class="d-flex justify-content-between align-items-start gap-2"
-    >
-
-      <a
-        [routerLink]="[
-          '/orders',
-          o.id
-        ]"
-        class="fw-bold"
-      >
-
-        طلب #{{ o.id }}
-
-      </a>
+      <div class="surface order-card">
 
 
-      <span
-        [class]="
-          statusClass(o.status)
-        "
-      >
+        <!-- Header -->
 
-        {{ statusLabel(o.status) }}
-
-      </span>
-
-    </div>
-
-
-    <!-- Address -->
-    <div
-      class="text-muted small mt-1"
-    >
-
-      {{ o.dateOfCreate
-        | date:'dd/MM/yyyy - h:mm a':'':'ar-EG'
-      }}
-
-      ·
-
-      {{ o.address.city }}
-
-      ،
-
-      {{ o.address.street }}
-
-    </div>
-
-
-    <!-- Footer -->
-    <div
-      class="
-        d-flex
-        justify-content-between
-        align-items-center
-        mt-3
-      "
-    >
-
-      <span class="price fs-5">
-
-        {{ o.total
-          | number:'1.0-2'
-        }}
-
-        ج.م
-
-      </span>
-
-
-      <div class="d-flex gap-2">
-
-
-        <!-- View -->
-  <button
-  type="button"
-  class="btn btn-sm btn-outline-secondary"
-  (click)="viewOrder(o.id)"
->
-  <i class="bi bi-eye me-1"></i>
-  عرض
-</button>
-
-
-        <!-- Edit -->
-        <button
-          type="button"
-          class="btn btn-sm btn-primary"
-          [disabled]="!canEdit(o)"
-          (click)="startEdit(o)"
+        <div
+          class="d-flex justify-content-between align-items-start gap-2"
         >
 
-          <i
-            class="bi bi-pencil me-1"
-          ></i>
+          <button
+            type="button"
+            class="btn btn-link p-0 fw-bold text-decoration-none"
+            (click)="viewOrder(o.id)"
+          >
 
-          تعديل
+            طلب #{{ o.id }}
 
-        </button>
+          </button>
+
+
+          <span
+            [class]="
+              statusClass(o.status)
+            "
+          >
+
+            {{ statusLabel(o.status) }}
+
+          </span>
+
+        </div>
+
+
+        <!-- Address -->
+
+        <div
+          class="text-muted small mt-1"
+        >
+
+          {{
+            o.dateOfCreate
+              | date:'dd/MM/yyyy - h:mm a':'':'ar-EG'
+          }}
+
+          ·
+
+          {{ o.address.city }}
+
+          ،
+
+          {{ o.address.street }}
+
+        </div>
+
+
+        <!-- Footer -->
+
+        <div
+          class="
+            d-flex
+            justify-content-between
+            align-items-center
+            mt-3
+          "
+        >
+
+          <span class="price fs-5">
+
+            {{
+              o.total
+                | number:'1.0-2'
+            }}
+
+            ج.م
+
+          </span>
+
+
+          <div class="d-flex gap-2">
+
+
+            <!-- View -->
+
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              [disabled]="viewingLoading"
+              (click)="viewOrder(o.id)"
+            >
+
+              @if (viewingLoading) {
+
+                <span
+                  class="spinner-border spinner-border-sm me-1"
+                ></span>
+
+              } @else {
+
+                <i
+                  class="bi bi-eye me-1"
+                ></i>
+
+              }
+
+              عرض
+
+            </button>
+
+
+            <!-- Edit -->
+
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              [disabled]="!canEdit(o)"
+              (click)="startEdit(o)"
+            >
+
+              <i
+                class="bi bi-pencil me-1"
+              ></i>
+
+              تعديل
+
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 
-    </div>
+    }
 
   </div>
 
-}
-
-
-  </div>
 
   <!-- Pagination -->
 
-<app-pagination
-[pageIndex]="pageIndex"
-[totalPages]="totalPages"
-(pageChange)="load($event)"
-
-> </app-pagination>
+  <app-pagination
+    [pageIndex]="pageIndex"
+    [totalPages]="totalPages"
+    (pageChange)="load($event)"
+  >
+  </app-pagination>
 
 }
