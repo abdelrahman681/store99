@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 import { Analytics } from "@vercel/analytics/next"
 import { ProductsManagementComponent } from './features/dashboard/products-management/products-management.component';
 export const routes: Routes = [
@@ -87,30 +88,35 @@ export const routes: Routes = [
     path: 'auth/login',
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
   },
-  {
-    path: 'dashboard',
-    loadComponent: () =>
-      import('./features/dashboard/dashboard.component')
-        .then(m => m.DashboardComponent)
-  },
+{
+  path: 'dashboard',
+  canActivate: [authGuard, adminGuard],
+  loadComponent: () =>
+    import('./features/dashboard/dashboard.component')
+      .then(m => m.DashboardComponent)
+},
   {
     path: 'dashboard/products',
+     canActivate: [authGuard, adminGuard],
     component: ProductsManagementComponent
   },
   {
     path: 'dashboard/users',
+     canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./features/dashboard/users-management/users-management.component')
         .then(m => m.UsersManagementComponent)
   },
   {
     path: 'dashboard/roles',
+     canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./features/dashboard/roles-management/roles-management.component')
         .then(m => m.RolesManagementComponent)
   },
   {
     path: 'dashboard/orders',
+     canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./features/dashboard/orders-management/orders-management.component')
         .then(m => m.OrdersManagementComponent)
@@ -132,12 +138,14 @@ export const routes: Routes = [
 },
   {
     path: 'dashboard/brands',
+     canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./features/dashboard/brand-management/brand-management.component')
         .then(m => m.BrandManagementComponent)
   },
     {
     path: 'dashboard/category',
+     canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./features/dashboard/category-management/category-management.component')
         .then(m => m.CategoryManagementComponent)
