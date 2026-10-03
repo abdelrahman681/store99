@@ -14,15 +14,40 @@ export class CategoryService {
 
   private baseUrl = `${environment.apiUrl}/Category`;
 
-  getCategories(): Observable<Pagination<Category>> {
+  // getCategories(): Observable<Pagination<Category>> {
 
+  //   const params = new HttpParams()
+  //     .set('PageIndex', 1)
+  //     .set('PageSize', 100);
+
+  //   return this.http.get<Pagination<Category>>(
+  //     `${this.baseUrl}/GetAllCategory`,
+  //     { params }
+  //   );
+  // }
+
+    getCategories(pageIndex = 1, pageSize = 100): Observable<Pagination<Category>> {
     const params = new HttpParams()
-      .set('PageIndex', 1)
-      .set('PageSize', 100);
+      .set('PageIndex', pageIndex)
+      .set('PageSize', pageSize);
 
     return this.http.get<Pagination<Category>>(
       `${this.baseUrl}/GetAllCategory`,
       { params }
     );
+  }
+
+   addCategory(name: string): Observable<string> {
+    return this.http.post(`${this.baseUrl}/AddCategory`, { name }, { responseType: 'text' });
+  }
+
+  // EditBrand بيقرأ الـ id من الـ body (AddOrUpdateBrandDTO.Id)، فبنبعته في الاتنين
+  // الراوت: PUT api/Brand/EditBrand — الـ id بيتبعت في الـ body (AddOrUpdateBrandDTO.Id)
+  editCategory(id: number, name: string): Observable<string> {
+    return this.http.put(`${this.baseUrl}/EditCategory`, { id, name }, { responseType: 'text' });
+  }
+
+  deleteCategory(id: number): Observable<string> {
+    return this.http.post(`${this.baseUrl}/DeleteCategory/${id}`, {}, { responseType: 'text' });
   }
 }

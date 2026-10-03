@@ -130,6 +130,18 @@ export const routes: Routes = [
     import('./features/notifications/notifications/notifications.component')
       .then(m => m.NotificationsComponent)
 },
+  {
+    path: 'dashboard/brands',
+    loadComponent: () =>
+      import('./features/dashboard/brand-management/brand-management.component')
+        .then(m => m.BrandManagementComponent)
+  },
+    {
+    path: 'dashboard/category',
+    loadComponent: () =>
+      import('./features/dashboard/category-management/category-management.component')
+        .then(m => m.CategoryManagementComponent)
+  },
   
   { path: '**', redirectTo: 'products' },
 ];

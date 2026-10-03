@@ -14,15 +14,28 @@ export class BrandService {
 
   private baseUrl = `${environment.apiUrl}/Brand`;
 
-  getBrands(): Observable<Pagination<Brand>> {
-
+  getBrands(pageIndex = 1, pageSize = 100): Observable<Pagination<Brand>> {
     const params = new HttpParams()
-      .set('PageIndex', 1)
-      .set('PageSize', 100);
+      .set('PageIndex', pageIndex)
+      .set('PageSize', pageSize);
 
     return this.http.get<Pagination<Brand>>(
       `${this.baseUrl}/GetAllBrand`,
       { params }
     );
+  }
+    // الـ endpoints الثلاثة بترد بنص عادي ("Brand Added"...) مش JSON، عشان كده responseType: 'text'
+  addBrand(name: string): Observable<string> {
+    return this.http.post(`${this.baseUrl}/AddBrand`, { name }, { responseType: 'text' });
+  }
+
+  // EditBrand بيقرأ الـ id من الـ body (AddOrUpdateBrandDTO.Id)، فبنبعته في الاتنين
+  // الراوت: PUT api/Brand/EditBrand — الـ id بيتبعت في الـ body (AddOrUpdateBrandDTO.Id)
+  editBrand(id: number, name: string): Observable<string> {
+    return this.http.put(`${this.baseUrl}/EditBrand`, { id, name }, { responseType: 'text' });
+  }
+
+  deleteBrand(id: number): Observable<string> {
+    return this.http.post(`${this.baseUrl}/DeleteBrand/${id}`, {}, { responseType: 'text' });
   }
 }
