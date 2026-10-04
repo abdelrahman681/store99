@@ -73,12 +73,13 @@ export class ProductReviewsComponent implements OnInit {
   }
 
   // ---------- ownership ----------
- isMine(r: Review): boolean {
-  if (!this.user || !r.customerId) {
+isMine(r: Review): boolean {
+  if (!this.user?.email || !r.customerEmail) {
     return false;
   }
 
-  return String(r.email) === String(this.user.email);
+  return r.customerEmail.trim().toLowerCase() ===
+         this.user.email.trim().toLowerCase();
 }
 
   author(r: Review): string {

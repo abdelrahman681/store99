@@ -10,13 +10,12 @@ export interface Review {
   userName?: string | null;
   displayName?: string | null;
   userEmail?: string | null;
-  email?: string | null;
+  customerEmail?: string | null;
   buyerEmail?: string | null;
   createdAt?: string | null;
   dateOfCreate?: string | null;
   date?: string | null;
   [key: string]: any;
-    customerId: string;
   customerName: string;
 }
 
