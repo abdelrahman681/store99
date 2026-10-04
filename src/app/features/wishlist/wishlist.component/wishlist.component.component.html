@@ -22,14 +22,14 @@
   </div>
 } @else if (loadFailed) {
   <div class="empty-state surface">
-    <i class="bi bi-wifi-off"></i>
+    <app-illustration kind="search" />
     <h5>تعذر تحميل المفضلة</h5>
     <p class="mb-3">تأكد من تسجيل الدخول واتصالك بالإنترنت.</p>
     <button type="button" class="btn btn-primary" (click)="loadWishlist()">إعادة المحاولة</button>
   </div>
 } @else if (wishlist.length === 0) {
   <div class="empty-state surface">
-    <i class="bi bi-heart"></i>
+    <app-illustration kind="heart" />
     <h5>قائمة المفضلة فاضية</h5>
     <p class="mb-3">أضف المنتجات اللي بتعجبك هنا.</p>
     <a routerLink="/products" class="btn btn-primary">تصفح المنتجات</a>

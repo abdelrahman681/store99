@@ -11,10 +11,12 @@ import { selectAllProducts } from '../../../store/products/products.selectors';
 import { BasketItem } from '../../../core/models/basket.model';
 import { ToastService } from '../../../core/services/toast.service';
 
+import { IllustrationComponent } from '../../../shared/components/illustration/illustration.component';
+
 @Component({
   selector: 'app-basket-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ProductPathPipe],
+  imports: [CommonModule, RouterLink, ProductPathPipe, IllustrationComponent],
   templateUrl: './basket-page.component.html'
 })
 export class BasketPageComponent {

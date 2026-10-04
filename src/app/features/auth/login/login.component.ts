@@ -27,6 +27,8 @@ import { environment } from '../../../../environments/environment';
 
 declare const google: any;
 
+import { AuthSideComponent } from '../../../shared/components/auth-side/auth-side.component';
+
 @Component({
 
   selector: 'app-login',
@@ -36,8 +38,7 @@ declare const google: any;
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink
-  ],
+    RouterLink, AuthSideComponent],
 
   templateUrl: './login.component.html'
 

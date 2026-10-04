@@ -5,10 +5,12 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Notification } from '../../../core/models/notification.model';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
+import { IllustrationComponent } from '../../../shared/components/illustration/illustration.component';
+
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule, PaginationComponent],
+  imports: [CommonModule, PaginationComponent, IllustrationComponent],
   templateUrl: './notifications.component.html'
 })
 export class NotificationsComponent implements OnInit {

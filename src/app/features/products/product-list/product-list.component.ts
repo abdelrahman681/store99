@@ -8,6 +8,8 @@ import { Store } from '@ngrx/store';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { HeroArtComponent } from '../../../shared/components/hero-art/hero-art.component';
+import { IllustrationComponent } from '../../../shared/components/illustration/illustration.component';
 import { ProductsActions } from '../../../store/products/products.actions';
 import {
   selectAllProducts,
@@ -26,7 +28,7 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PaginationComponent, ProductPathPipe],
+  imports: [CommonModule, FormsModule, RouterLink, PaginationComponent, ProductPathPipe, HeroArtComponent, IllustrationComponent],
   templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {
@@ -71,6 +73,22 @@ export class ProductListComponent implements OnInit {
     this.search$
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.load(1));
+  }
+
+  readonly starSlots = [1, 2, 3, 4, 5];
+
+  /** category chips under the hero: picking one filters the list (0 = all) */
+  pickCategory(id: number): void {
+    this.selectedCategoryId = id;
+    this.load(1);
+  }
+
+  isLowStock(product: Product): boolean {
+    return product.stockQuantity > 0 && product.stockQuantity <= 5;
+  }
+
+  scrollToProducts(): void {
+    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   onSearchChange(): void {

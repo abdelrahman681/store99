@@ -7,10 +7,12 @@ import { ToastService } from '../../../core/services/toast.service';
 import { WishlistData, WishlistPagination } from '../../../core/models/product.model';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
+import { IllustrationComponent } from '../../../shared/components/illustration/illustration.component';
+
 @Component({
   selector: 'app-wishlist',
   standalone: true,
-  imports: [CommonModule, RouterLink, PaginationComponent, ProductPathPipe],
+  imports: [CommonModule, RouterLink, PaginationComponent, ProductPathPipe, IllustrationComponent],
   templateUrl: './wishlist.component.component.html'
 })
 export class WishlistComponent implements OnInit {

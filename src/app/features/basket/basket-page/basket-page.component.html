@@ -6,7 +6,7 @@
 
   @if (items.length === 0) {
     <div class="empty-state surface">
-      <i class="bi bi-cart-x"></i>
+      <app-illustration kind="cart" />
       <h5>السلة فارغة</h5>
       <p class="mb-3">ابدأ بإضافة منتجات تعجبك.</p>
       <a routerLink="/products" class="btn btn-primary">تصفح المنتجات</a>
@@ -64,6 +64,10 @@
           <button type="button" class="btn btn-primary btn-lg w-100" (click)="checkout()">
             إتمام الشراء <i class="bi bi-arrow-left ms-1"></i>
           </button>
+          <div class="trust-mini">
+            <span><i class="bi bi-shield-check"></i>دفع آمن</span>
+            <span><i class="bi bi-truck"></i>توصيل لحد البيت</span>
+          </div>
         </div>
       </div>
     </div>

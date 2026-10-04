@@ -6,10 +6,12 @@ import { AddressDTO } from '../../../core/models/address.model';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 
+import { IllustrationComponent } from '../../../shared/components/illustration/illustration.component';
+
 @Component({
   selector: 'app-addresses',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IllustrationComponent],
   templateUrl: './address-list.component.html'
 })
 export class AddressListComponent implements OnInit {

@@ -1,34 +1,51 @@
+// =====================================================================
+// Store99 design tokens
+// warm sand surfaces · espresso ink · tangerine brand · teal + sun accents
+// =====================================================================
 :root {
-  --brand: #c2410c;
-  --brand-dark: #9a3412;
-  --brand-soft: #fdf0e6;
-  --ink: #1c1917;
-  --ink-2: #44403c;
-  --muted: #78716c;
-  --line: #e4dfd6;
-  --bg: #f6f4f0;
-  --surface: #ffffff;
-  --success: #16a34a;
+  --brand: #d9480f;
+  --brand-dark: #b83a0a;
+  --brand-soft: #fdebdc;
+  --brand-rgb: 217, 72, 15;
+
+  --teal: #0f766e;
+  --teal-soft: #dcf3ef;
+  --sun: #f5b301;
+  --sun-soft: #fff3c4;
+  --rose: #e11d48;
+  --rose-soft: #ffe4ea;
+
+  --ink: #1d1a16;
+  --ink-2: #4a443c;
+  --muted: #8a8176;
+  --line: #ebe4d8;
+  --bg: #f8f4ee;
+  --bg-2: #f1ebe1;
+  --surface: #fffdf9;
+
+  --success: #15803d;
   --danger: #dc2626;
   --warning: #d97706;
-  --info: #0284c7;
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, .06);
-  --shadow-sm: 0 2px 10px rgba(15, 23, 42, .07);
-  --shadow-md: 0 12px 32px rgba(15, 23, 42, .12);
+  --info: #0369a1;
 
-  // Re-point Bootstrap's own tokens so every .text-primary / .bg-primary / link follows the brand colour
-  --bs-primary: #c2410c;
-  --bs-primary-rgb: 194, 65, 12;
-  --bs-link-color: #c2410c;
-  --bs-link-color-rgb: 194, 65, 12;
-  --bs-link-hover-color: #9a3412;
-  --bs-link-hover-color-rgb: 154, 52, 18;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow-xs: 0 1px 2px rgba(60, 40, 20, .06);
+  --shadow-sm: 0 2px 6px rgba(60, 40, 20, .05), 0 8px 20px rgba(60, 40, 20, .06);
+  --shadow-md: 0 4px 10px rgba(60, 40, 20, .06), 0 18px 40px rgba(60, 40, 20, .12);
+  --ring: 0 0 0 .25rem rgba(var(--brand-rgb), .16);
+
+  // Bootstrap re-pointing: every .text-primary / link / border follows the brand
+  --bs-primary: #d9480f;
+  --bs-primary-rgb: 217, 72, 15;
+  --bs-link-color: #d9480f;
+  --bs-link-color-rgb: 217, 72, 15;
+  --bs-link-hover-color: #b83a0a;
+  --bs-link-hover-color-rgb: 184, 58, 10;
   --bs-body-font-family: 'Cairo', 'Segoe UI', Tahoma, system-ui, sans-serif;
-  --bs-body-color: #1c1917;
-  --bs-body-bg: #f6f4f0;
-  --bs-border-color: #e4dfd6;
+  --bs-body-color: #1d1a16;
+  --bs-body-bg: #f8f4ee;
+  --bs-border-color: #ebe4d8;
 }
 
 *, *::before, *::after { -webkit-tap-highlight-color: transparent; }
@@ -38,21 +55,29 @@ body {
   min-height: 100vh;
   margin: 0;
   font-family: var(--bs-body-font-family);
-  background: var(--bg);
   color: var(--ink);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(800px 380px at 95% -80px, rgba(var(--brand-rgb), .09), transparent 70%),
+    radial-gradient(700px 360px at -5% 0, rgba(15, 118, 110, .07), transparent 70%);
+  background-repeat: no-repeat;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  line-height: 1.7;
 }
 img { max-width: 100%; }
-a { text-decoration: none; }
+a { text-decoration: none; transition: color .2s; }
 
-h1, h2, h3, h4, h5, h6 { font-weight: 800; color: var(--ink); }
+h1, h2, h3, h4, h5, h6 { font-weight: 800; color: var(--ink); line-height: 1.35; letter-spacing: -.01em; }
 
-::selection { background: rgba(194, 65, 12, .18); }
+::selection { background: rgba(var(--brand-rgb), .2); }
+:focus-visible { outline: 3px solid rgba(var(--brand-rgb), .5); outline-offset: 2px; }
 
-// Accessible focus ring for keyboard users only
-:focus-visible { outline: 3px solid rgba(194, 65, 12, .45); outline-offset: 2px; }
+// thin, warm scrollbars on desktop
+@media (hover: hover) {
+  * { scrollbar-width: thin; scrollbar-color: #d6cbb8 transparent; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }

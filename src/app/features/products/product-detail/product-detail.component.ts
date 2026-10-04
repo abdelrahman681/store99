@@ -36,6 +36,7 @@ export class ProductDetailComponent implements OnInit {
   private titleService = inject(Title);
 
   loading = true;
+  readonly starSlots = [1, 2, 3, 4, 5];
 
   // the URL segment is "10-iphone-15" (or just "10"): the number in front is the product id
   private routeParam = this.route.snapshot.paramMap.get('id');

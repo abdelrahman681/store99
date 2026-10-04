@@ -1,35 +1,59 @@
 <footer class="app-footer">
+  <svg class="footer-wave" viewBox="0 0 1440 34" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 34V14C120 30 240 34 360 24C520 10 640 -6 820 6C1000 18 1180 34 1300 24C1370 18 1410 10 1440 4V34Z" fill="#1d1a16"/>
+  </svg>
+
   <div class="container">
-    <div class="row gy-4">
-      <div class="col-12 col-md-5">
+    <div class="row gy-4 gx-lg-5">
+      <div class="col-12 col-lg-4">
         <div class="brand">
-          <span class="brand-mark"><i class="bi bi-bag-fill"></i></span>
-          Store99
+          <span class="brand-mark"><app-brand-logo /></span>
+          <span>Store<b>99</b></span>
         </div>
-        <p class="mb-0">وجهتك للتسوق أونلاين بأسعار وجودة تناسبك.</p>
+        <p class="mb-0">وجهتك للتسوق أونلاين. منتجات متنوعة بأسعار مناسبة، وتجربة شراء بسيطة من أول كليك لحد باب بيتك.</p>
+        <div class="pay-icons" aria-label="طرق الدفع">
+          <i class="fa-brands fa-cc-visa" title="Visa"></i>
+          <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+          <i class="fa-brands fa-cc-stripe" title="Stripe"></i>
+        </div>
       </div>
 
-      <div class="col-6 col-md-3">
-        <h6 class="mb-3">روابط سريعة</h6>
+      <div class="col-6 col-lg-2">
+        <h6 class="mb-3">تسوّق</h6>
         <ul>
-          <li><a routerLink="/products" class="foot-link">المنتجات</a></li>
+          <li><a routerLink="/products" class="foot-link">كل المنتجات</a></li>
           <li><a routerLink="/wishlist" class="foot-link">المفضلة</a></li>
-          <li><a routerLink="/orders" class="foot-link">طلباتي</a></li>
-          <li><a routerLink="/contact" class="foot-link">تواصل معنا</a></li>
+          <li><a routerLink="/basket" class="foot-link">السلة</a></li>
         </ul>
       </div>
 
-      <div class="col-6 col-md-4">
-        <h6 class="mb-3">تابعنا</h6>
+      <div class="col-6 col-lg-2">
+        <h6 class="mb-3">حسابي</h6>
+        <ul>
+          <li><a routerLink="/profile" class="foot-link">الملف الشخصي</a></li>
+          <li><a routerLink="/orders" class="foot-link">طلباتي</a></li>
+          <li><a routerLink="/addresses" class="foot-link">عناويني</a></li>
+        </ul>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <h6 class="mb-3">محتاج مساعدة؟</h6>
+        <div class="contact-line mb-3"><i class="bi bi-chat-dots"></i> <a routerLink="/contact" class="foot-link">ابعتلنا رسالة وهنرد عليك</a></div>
         <div class="social">
-          <a href="#" (click)="$event.preventDefault()" aria-label="فيسبوك"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://www.facebook.com/abdelrahman.salah.764362/" target="_blank"  aria-label="فيسبوك"><i class="fa-brands fa-facebook-f"></i></a>
           <a href="#" (click)="$event.preventDefault()" aria-label="إنستجرام"><i class="fa-brands fa-instagram"></i></a>
           <a href="#" (click)="$event.preventDefault()" aria-label="إكس"><i class="fa-brands fa-x-twitter"></i></a>
-          <a href="#" (click)="$event.preventDefault()" aria-label="واتساب"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="https://wa.me/201140988201" target="_blank" rel="noopener noreferrer" aria-label="واتساب"><i class="fa-brands fa-whatsapp"></i></a>
+  
+
+
         </div>
       </div>
     </div>
 
-    <div class="bottom">© {{ year }} Store99 — جميع الحقوق محفوظة</div>
+    <div class="bottom">
+      <span>© {{ year }} Store99 — جميع الحقوق محفوظة</span>
+     <span style="font-size: 18px;">Store99 Developed by <a href="https://www.linkedin.com/in/abdulrahman-salah-7ab96924b" target="_blank" rel="noopener noreferrer">Abdulrahman Salah</a></span>
+    </div>
   </div>
 </footer>

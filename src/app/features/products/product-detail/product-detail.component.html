@@ -39,12 +39,19 @@
         </div>
 
         <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-          <span class="badge bg-warning text-dark"><i class="fa-solid fa-star me-1"></i>{{ p.averageRating | number:'1.1-1' }}</span>
-          <span class="text-muted small">({{ p.reviewsCount }} تقييم)</span>
+          @if (p.reviewsCount > 0) {
+            <span class="review-stars fs-6" [attr.aria-label]="p.averageRating + ' من 5'">
+              @for (n of starSlots; track n) { <i class="bi bi-star-fill" [class.is-on]="n <= p.averageRating + 0.25"></i> }
+            </span>
+            <strong>{{ p.averageRating | number:'1.1-1' }}</strong>
+            <span class="text-muted small">({{ p.reviewsCount }} تقييم)</span>
+          } @else {
+            <span class="text-muted small"><i class="bi bi-star me-1"></i>لا توجد تقييمات بعد</span>
+          }
         </div>
 
         <div class="detail-price mb-3">
-          <span class="price">{{ p.price | number:'1.0-2' }}</span> <small class="text-muted">ج.م</small>
+          <span class="price">{{ p.price | number:'1.0-2' }}</span> <small>ج.م</small>
         </div>
 
         @if (p.description) {
@@ -109,11 +116,27 @@
             لقد وصلت إلى أقصى كمية متاحة من هذا المنتج.
           </div>
         }
+
+        <ul class="trust-list">
+          <li><i class="bi bi-truck"></i>توصيل لحد باب البيت</li>
+          <li><i class="bi bi-shield-check"></i>دفع آمن ومؤمّن</li>
+          <li><i class="bi bi-headset"></i>دعم لأي استفسار</li>
+        </ul>
       </div>
     </div>
+  </div>
+
+  <div class="buy-bar d-lg-none">
+    <div class="buy-bar__price"><small>السعر</small><span class="price">{{ p.price | number:'1.0-2' }} ج.م</span></div>
+    <button type="button" class="btn btn-primary btn-lg"
+            [disabled]="p.stockQuantity === 0 || isAtStockLimit(p)" (click)="addToBasket(p)">
+      <i class="bi bi-cart-plus me-2"></i>{{ p.stockQuantity === 0 ? 'غير متوفر' : isAtStockLimit(p) ? 'الحد الأقصى' : 'أضف للسلة' }}
+    </button>
   </div>
 }
 
 @if (!loading) {
   <app-product-reviews [productId]="productId" (changed)="onReviewsChanged()"></app-product-reviews>
 }
+
+<div class="buy-bar-spacer d-lg-none"></div>

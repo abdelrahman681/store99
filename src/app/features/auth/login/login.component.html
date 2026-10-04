@@ -5,7 +5,9 @@
   font-weight: bold;
 }
 </style>
-<div class="auth-wrap">
+<div class="auth-split">
+  <app-auth-side title="أهلاً بيك تاني في" highlight="Store99" text="سجّل دخولك وكمّل تسوّقك من حيث وقفت." />
+  <div class="auth-main">
   <div class="auth-card">
 
     <div class="auth-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
@@ -78,5 +80,6 @@
     <p class="text-center text-muted mt-4 mb-0">
       ماعندكش حساب؟ <a routerLink="/auth/register" class="fw-bold">إنشاء حساب</a>
     </p>
+  </div>
   </div>
 </div>

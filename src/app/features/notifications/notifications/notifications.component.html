@@ -13,7 +13,7 @@
   </div>
 } @else if (notifications.length === 0) {
   <div class="empty-state surface">
-    <i class="fa-regular fa-bell-slash"></i>
+    <app-illustration kind="bell" />
     <h5>لا توجد إشعارات</h5>
     <p class="mb-0">هتظهر هنا كل التحديثات الخاصة بطلباتك.</p>
   </div>
@@ -33,7 +33,11 @@
         </div>
       </div>
     }
+          <app-pagination
+        [pageIndex]="currentPage"
+        [totalPages]="totalPages"
+        (pageChange)="goToPage($event)">
+      </app-pagination>
   </div>
 
-  <app-pagination [pageIndex]="currentPage" [totalPages]="totalPages" (pageChange)="goToPage($event)"></app-pagination>
 }

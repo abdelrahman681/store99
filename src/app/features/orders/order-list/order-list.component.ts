@@ -11,10 +11,12 @@ import { ConfirmService } from '../../../core/services/confirm.service';
 import { OrderToReturn } from '../../../core/models/order.model';
 import { isAwaitingPayment, orderStatusClass, orderStatusLabel } from '../../../core/utils/order-status';
 
+import { IllustrationComponent } from '../../../shared/components/illustration/illustration.component';
+
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, PaginationComponent],
+  imports: [CommonModule, RouterLink, PaginationComponent, IllustrationComponent],
   templateUrl: './order-list.component.html'
 })
 export class OrderListComponent implements OnInit {

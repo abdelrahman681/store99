@@ -13,7 +13,7 @@
   @if (orders$ | async; as orders) {
     @if (orders.length === 0) {
       <div class="empty-state surface">
-        <i class="bi bi-bag-x"></i>
+        <app-illustration kind="box" />
         <h5>لا توجد طلبات بعد</h5>
         <p class="mb-3">لما تطلب أول أوردر هيظهر هنا.</p>
         <a routerLink="/products" class="btn btn-primary">ابدأ التسوق</a>

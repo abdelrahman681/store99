@@ -5,6 +5,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs';
 
+import { BrandLogoComponent } from '../brand-logo/brand-logo.component';
 import { selectCurrentUser } from '../../../store/auth/auth.selectors';
 import { selectBasketItemsCount } from '../../../store/basket/basket.selectors';
 import { AuthActions } from '../../../store/auth/auth.actions';
@@ -12,7 +13,7 @@ import { AuthActions } from '../../../store/auth/auth.actions';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, BrandLogoComponent],
   templateUrl: './navbar.component.html'
 })
 export class NavbarComponent {

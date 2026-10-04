@@ -1,30 +1,77 @@
-<!-- Title -->
-<div class="page-head">
-  <h1 class="page-title"><i class="fa-solid fa-store"></i> المنتجات</h1>
-  @if (paging$ | async; as paging) {
-    @if (paging.totalCount > 0) {
-      <span class="text-muted small">{{ paging.totalCount }} منتج</span>
-    }
-  }
+@let paging = paging$ | async;
+
+<!-- ================= Hero + benefits (only on the unfiltered first page) ================= -->
+@if (!hasFilters && (paging?.pageIndex ?? 1) === 1) {
+
+  <section class="hero">
+    <div class="hero__grid">
+      <div>
+        <span class="hero__eyebrow"><i class="bi bi-stars"></i> أهلاً بيك في Store99</span>
+        <h1 class="hero__title">كل اللي محتاجه <em>في مكان واحد</em></h1>
+        <p class="hero__text">منتجات متنوعة بأسعار مناسبة، واختيار بسيط من أول كليك لحد ما الطلب يوصل لباب بيتك.</p>
+
+        <div class="hero__cta">
+          <button type="button" class="btn btn-primary btn-lg" (click)="scrollToProducts()">
+            <i class="bi bi-bag-heart me-2"></i>تصفّح المنتجات
+          </button>
+          <a routerLink="/wishlist" class="btn btn-outline-secondary btn-lg"><i class="bi bi-heart me-2"></i>المفضلة</a>
+        </div>
+
+        @if (paging && paging.totalCount > 0) {
+          <div class="hero__stats">
+            <div><b>{{ paging.totalCount }}+</b><span>منتج متاح</span></div>
+            <div><b>{{ ((brands$ | async) ?? []).length }}</b><span>ماركة</span></div>
+            <div><b>{{ ((categories$ | async) ?? []).length }}</b><span>فئة</span></div>
+          </div>
+        }
+      </div>
+
+      <div class="hero__art"><app-hero-art [chips]="true" /></div>
+    </div>
+  </section>
+
+  <section class="benefits" aria-label="مميزات المتجر">
+    <div class="benefit"><span class="benefit__icon benefit__icon--brand"><i class="bi bi-truck"></i></span><div><b>توصيل سريع</b><small>نوصّلك لحد باب البيت</small></div></div>
+    <div class="benefit"><span class="benefit__icon benefit__icon--teal"><i class="bi bi-shield-check"></i></span><div><b>دفع آمن</b><small>معاملات مؤمّنة بالكامل</small></div></div>
+    <div class="benefit"><span class="benefit__icon benefit__icon--sun"><i class="bi bi-grid-1x2"></i></span><div><b>تشكيلة واسعة</b><small>ماركات وفئات متنوعة</small></div></div>
+    <div class="benefit"><span class="benefit__icon benefit__icon--rose"><i class="bi bi-headset"></i></span><div><b>دعم العملاء</b><small>إحنا هنا لمساعدتك</small></div></div>
+  </section>
+}
+
+<!-- ================= Products ================= -->
+<div id="products" class="section-head">
+  <div>
+    <h2>{{ hasFilters ? 'نتائج البحث' : 'كل المنتجات' }}</h2>
+    @if (paging && paging.totalCount > 0) { <p>{{ paging.totalCount }} منتج</p> }
+  </div>
 </div>
 
+<!-- Category chips -->
+@if (((categories$ | async) ?? []).length > 0) {
+  <div class="cat-strip" role="tablist" aria-label="الفئات">
+    <button type="button" class="cat-chip" [class.is-active]="selectedCategoryId === 0" (click)="pickCategory(0)">
+      <span class="cat-chip__dot"><i class="bi bi-grid-fill"></i></span> الكل
+    </button>
+    @for (c of (categories$ | async) ?? []; track c.id) {
+      <button type="button" class="cat-chip" [class.is-active]="selectedCategoryId === c.id" (click)="pickCategory(c.id)">
+        <span class="cat-chip__dot">{{ c.name.charAt(0) }}</span> {{ c.name }}
+      </button>
+    }
+  </div>
+}
+
 <!-- Filters -->
-<section class="filters-card mb-3">
+<section class="filters-card mb-4">
   <div class="row g-2">
-    <div class="col-12 col-lg-3">
+    <div class="col-12 col-lg-4">
       <div class="search-box">
         <i class="bi bi-search"></i>
-        <input
-          class="form-control"
-          type="search"
-          placeholder="ابحث عن منتج..."
-          aria-label="بحث"
-          [(ngModel)]="searchValue"
-          (ngModelChange)="onSearchChange()">
+        <input class="form-control" type="search" placeholder="ابحث عن منتج..." aria-label="بحث"
+               [(ngModel)]="searchValue" (ngModelChange)="onSearchChange()">
       </div>
     </div>
 
-    <div class="col-6 col-md-4 col-lg-3">
+    <div class="col-6 col-lg-4">
       <select class="form-select" aria-label="الماركة" [(ngModel)]="selectedBrandId" (change)="onFilterChange()">
         <option [ngValue]="0">كل الماركات</option>
         @for (b of (brands$ | async) ?? []; track b.id) {
@@ -33,16 +80,7 @@
       </select>
     </div>
 
-    <div class="col-6 col-md-4 col-lg-3">
-      <select class="form-select" aria-label="الفئة" [(ngModel)]="selectedCategoryId" (change)="onFilterChange()">
-        <option [ngValue]="0">كل الفئات</option>
-        @for (c of (categories$ | async) ?? []; track c.id) {
-          <option [ngValue]="c.id">{{ c.name }}</option>
-        }
-      </select>
-    </div>
-
-    <div class="col-12 col-md-4 col-lg-3">
+    <div class="col-6 col-lg-4">
       <select class="form-select" aria-label="الترتيب" [(ngModel)]="sort" (change)="onFilterChange()">
         <option value="">الترتيب: افتراضي</option>
         <option value="PriceAsc">السعر: من الأقل</option>
@@ -60,19 +98,21 @@
   }
 </section>
 
-<!-- Products -->
 @if (loading$ | async) {
 
   <div class="row g-2 g-md-3" aria-busy="true">
     @for (s of skeletons; track $index) {
       <div class="col-6 col-md-4 col-lg-3">
         <div class="product-card">
-          <div class="product-card__media"><div class="skeleton w-100 h-100"></div></div>
+          <div class="product-card__media"><div class="skeleton w-100 h-100" style="border-radius: 0"></div></div>
           <div class="product-card__body">
             <div class="skeleton" style="height: 12px; width: 40%"></div>
             <div class="skeleton mt-2" style="height: 16px; width: 90%"></div>
-            <div class="skeleton mt-2" style="height: 18px; width: 50%"></div>
-            <div class="skeleton mt-3" style="height: 40px"></div>
+            <div class="skeleton mt-2" style="height: 12px; width: 55%"></div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="skeleton" style="height: 24px; width: 45%"></div>
+              <div class="skeleton" style="height: 40px; width: 40px; border-radius: 12px"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -83,12 +123,12 @@
 
   @if ((products$ | async) ?? []; as products) {
     @if (products.length === 0) {
-      <div class="empty-state">
-        <i class="bi bi-search"></i>
+      <div class="empty-state surface">
+        <app-illustration kind="search" />
         <h5>لا توجد منتجات مطابقة</h5>
         <p class="mb-3">جرّب تغيير كلمة البحث أو الفلاتر.</p>
         @if (hasFilters) {
-          <button type="button" class="btn btn-outline-primary" (click)="resetFilters()">مسح الفلاتر</button>
+          <button type="button" class="btn btn-primary" (click)="resetFilters()">مسح الفلاتر</button>
         }
       </div>
     } @else {
@@ -101,45 +141,47 @@
                 <img [src]="p.pictureUrl" [alt]="p.name" loading="lazy">
               </a>
 
-              @if (p.stockQuantity === 0) {
-                <span class="product-card__badge product-card__badge--out">غير متوفر</span>
-              }
+              <div class="product-card__badges">
+                @if (p.stockQuantity === 0) {
+                  <span class="product-card__badge product-card__badge--out">غير متوفر</span>
+                } @else if (isLowStock(p)) {
+                  <span class="product-card__badge product-card__badge--low">آخر {{ p.stockQuantity }} قطع</span>
+                }
+              </div>
 
-              <button
-                type="button"
-                class="product-card__wish"
-                aria-label="أضف للمفضلة"
-                title="أضف للمفضلة"
-                (click)="addToWishlist(p)">
+              <button type="button" class="product-card__wish" aria-label="أضف للمفضلة" title="أضف للمفضلة" (click)="addToWishlist(p)">
                 <i class="bi bi-heart-fill"></i>
               </button>
 
               <div class="product-card__body">
-                @if (p.brandName) {
-                  <span class="product-card__brand">{{ p.brandName }}</span>
-                }
+                @if (p.brandName) { <span class="product-card__brand">{{ p.brandName }}</span> }
                 <a class="product-card__title" [routerLink]="p.id | productPath: p.name">{{ p.name }}</a>
 
-                <div class="product-card__price">
-                  <span class="price">{{ p.price | number:'1.0-2' }}</span>
-                  <small class="text-muted">ج.م</small>
+                <div class="product-card__rating">
+                  @if (p.reviewsCount > 0) {
+                    <span class="stars" [attr.aria-label]="p.averageRating + ' من 5'">
+                      @for (n of starSlots; track n) { <i class="bi bi-star-fill" [class.on]="n <= p.averageRating + 0.25"></i> }
+                    </span>
+                    <span>({{ p.reviewsCount }})</span>
+                  }
                 </div>
 
-                <button
-                  type="button"
-                  class="btn w-100 mt-2"
-                  [class.btn-primary]="p.stockQuantity > 0 && !isAtStockLimit(p)"
-                  [class.btn-secondary]="p.stockQuantity === 0 || isAtStockLimit(p)"
-                  [disabled]="p.stockQuantity === 0 || isAtStockLimit(p)"
-                  (click)="addToBasket(p)">
-                  @if (p.stockQuantity === 0) {
-                    غير متوفر حالياً
-                  } @else if (isAtStockLimit(p)) {
-                    وصلت للحد الأقصى
-                  } @else {
-                    <i class="fa-solid fa-cart-shopping me-1"></i> أضف للسلة
-                  }
-                </button>
+                <div class="product-card__foot">
+                  <div class="product-card__price">
+                    <span class="price">{{ p.price | number:'1.0-2' }}</span>
+                    <small>ج.م</small>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="product-card__cart"
+                    [disabled]="p.stockQuantity === 0 || isAtStockLimit(p)"
+                    [attr.aria-label]="p.stockQuantity === 0 ? 'غير متوفر' : isAtStockLimit(p) ? 'وصلت للحد الأقصى' : 'أضف للسلة'"
+                    [title]="p.stockQuantity === 0 ? 'غير متوفر حالياً' : isAtStockLimit(p) ? 'وصلت للحد الأقصى' : 'أضف للسلة'"
+                    (click)="addToBasket(p)">
+                    <i class="bi" [class.bi-cart-plus-fill]="p.stockQuantity > 0 && !isAtStockLimit(p)" [class.bi-slash-circle]="p.stockQuantity === 0 || isAtStockLimit(p)"></i>
+                  </button>
+                </div>
               </div>
             </article>
           </div>
@@ -150,10 +192,6 @@
 }
 
 <!-- Pagination -->
-@if (paging$ | async; as paging) {
-  <app-pagination
-    [pageIndex]="paging.pageIndex"
-    [totalPages]="paging.totalPages"
-    (pageChange)="load($event)">
-  </app-pagination>
+@if (paging) {
+  <app-pagination [pageIndex]="paging.pageIndex" [totalPages]="paging.totalPages" (pageChange)="load($event)"></app-pagination>
 }

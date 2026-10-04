@@ -32,14 +32,15 @@ import { environment } from '../../../../environments/environment';
 
 declare const google: any;
 
+import { AuthSideComponent } from '../../../shared/components/auth-side/auth-side.component';
+
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink
-  ],
+    RouterLink, AuthSideComponent],
   templateUrl: './register.component.html'
 })
 export class RegisterComponent implements AfterViewInit {
