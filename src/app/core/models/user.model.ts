@@ -12,7 +12,6 @@ export interface UserDTO {
   pictureUrl: string;
   gender: string;
   roleName?: string;
-  id:string;
 }
 
 export interface RegisterPayload {
