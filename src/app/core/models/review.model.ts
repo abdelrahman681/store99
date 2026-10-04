@@ -16,6 +16,8 @@ export interface Review {
   dateOfCreate?: string | null;
   date?: string | null;
   [key: string]: any;
+    customerId: string;
+  customerName: string;
 }
 
 export interface ReviewsPage {

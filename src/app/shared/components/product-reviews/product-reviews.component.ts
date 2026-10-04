@@ -73,18 +73,13 @@ export class ProductReviewsComponent implements OnInit {
   }
 
   // ---------- ownership ----------
-  isMine(r: Review): boolean {
-    if (!this.user) return false;
-    if (this.myIds.has(r.id)) return true;
-
-    const mail = this.user.email?.toLowerCase();
-    const emails = [r['userEmail'], r['email'], r['buyerEmail'], r['appUserEmail'], r['reviewerEmail']];
-    if (mail && emails.some(e => typeof e === 'string' && e.toLowerCase() === mail)) return true;
-
-    const name = this.user.displayName?.trim().toLowerCase();
-    const names = [r['userName'], r['displayName'], r['reviewerName'], r['appUserName'], r['customerName']];
-    return !!name && names.some(n => typeof n === 'string' && n.trim().toLowerCase() === name);
+ isMine(r: Review): boolean {
+  if (!this.user || !r.customerId) {
+    return false;
   }
+
+  return String(r.customerId) === String(this.user.id);
+}
 
   author(r: Review): string {
     return r['userName'] || r['displayName'] || r['reviewerName'] || r['customerName'] || 'مستخدم';
