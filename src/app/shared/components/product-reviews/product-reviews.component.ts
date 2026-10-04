@@ -78,7 +78,7 @@ export class ProductReviewsComponent implements OnInit {
     return false;
   }
 
-  return String(r.customerName) === String(this.user.displayName);
+  return String(r.email) === String(this.user.email);
 }
 
   author(r: Review): string {
