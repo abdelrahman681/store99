@@ -76,6 +76,7 @@ id: 0,
 name: '',
 description: '',
 price: 0,
+oldPrice: 0,
 productBrandId: 0,
 productCategoryId: 0,
 stockQuantity: 0,
@@ -292,7 +293,8 @@ this.productService
 
         price:
           productDetails.price,
-
+        oldPrice:
+          productDetails.oldPrice,
         productBrandId:
           (productDetails as any)
             .productBrandId ?? 0,
@@ -383,6 +385,7 @@ updateProduct(): void {
       description: this.selectedProduct.description,
 
       price: this.selectedProduct.price,
+      oldPrice: this.selectedProduct.oldPrice,
 
       productBrandId: this.selectedProduct.productBrandId,
 
@@ -466,7 +469,7 @@ this.selectedProduct = {
   description: '',
 
   price: 0,
-
+  oldPrice: 0,
   productBrandId: 0,
 
   productCategoryId: 0,

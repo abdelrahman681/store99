@@ -50,9 +50,24 @@
           }
         </div>
 
-        <div class="detail-price mb-3">
-          <span class="price">{{ p.price | number:'1.0-2' }}</span> <small>ج.م</small>
-        </div>
+
+<div class="detail-price mb-3">
+  @if (p.discount > 0) {
+    <span class="text-muted text-decoration-line-through me-2">
+      {{ p.oldPrice | number:'1.0-2' }}
+    </span>
+
+    <span class="price">{{ p.price | number:'1.0-2' }}</span>
+    <small>ج.م</small>
+
+    <span class="badge bg-danger ms-2">
+      خصم {{ p.discount | number:'1.0-1' }}%
+    </span>
+  } @else {
+    <span class="price">{{ p.price | number:'1.0-2' }}</span>
+    <small>ج.م</small>
+  }
+</div>
 
         @if (p.description) {
           <div class="mb-4">

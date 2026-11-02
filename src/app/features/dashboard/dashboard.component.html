@@ -182,7 +182,32 @@
 
         </div>
 
+        <!-- OldPrice -->
+        <div class="mb-3">
 
+          <label class="form-label">
+            السعر القديم
+          </label>
+
+          <input
+            type="number"
+            class="form-control"
+            formControlName="oldPrice"
+            min="1"
+            placeholder="اكتب السعر القديم">
+
+          <div
+            *ngIf="
+              form.controls.oldPrice.touched &&
+              form.controls.oldPrice.invalid
+            "
+            class="text-danger mt-1">
+
+            السعر يجب أن يكون أكبر من -1
+
+          </div>
+
+        </div>
         <!-- Brand -->
         <div class="mb-3">
 

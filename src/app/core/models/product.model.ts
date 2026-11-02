@@ -9,6 +9,8 @@ export interface Product {
   stockQuantity: number;
   averageRating: number;
   reviewsCount: number;
+  oldPrice: number;
+  discount: number;
 }
 
 export type SortOption = 'PriceAsc' | 'PriceDesc' | 'NameAsc' | 'NameDesc';
@@ -27,6 +29,8 @@ export interface WishlistItem {
   productName: string;
   price: number;
   pictureUrl: string;
+    oldPrice: number;
+  discount: number;
 }
 export interface WishlistProduct {
   id: number;
@@ -39,6 +43,8 @@ export interface WishlistProduct {
   stockQuantity: number;
   averageRating: number;
   reviewsCount: number;
+    oldPrice: number;
+  discount: number;
 }
 
 export interface WishlistData {

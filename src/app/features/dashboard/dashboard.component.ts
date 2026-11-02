@@ -88,7 +88,12 @@ export class DashboardComponent implements OnInit {
         Validators.min(1)
       ]
     ],
-
+    oldPrice: [
+      0,
+      [
+        Validators.min(1)
+      ]
+    ],
     productBrandId: [
       0,
       [
@@ -262,6 +267,7 @@ submit(): void {
     name: '',
     description: '',
     price: 0,
+    oldPrice: 0,
     productBrandId: 0,
     productCategoryId: 0,
     stockQuantity: 0
