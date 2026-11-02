@@ -193,7 +193,10 @@ export class ProductService {
       'Price',
       product.price.toString()
     );
-
+ formData.append(
+  'OldPrice',
+  product.oldPrice.toString()
+);
     formData.append(
       'StockQuantity',
       product.stockQuantity.toString()
