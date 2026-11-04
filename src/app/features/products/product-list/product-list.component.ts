@@ -22,6 +22,8 @@ import { BasketActions } from '../../../store/basket/basket.actions';
 import { selectBasketItems } from '../../../store/basket/basket.selectors';
 import { SortOption, Product } from '../../../core/models/product.model';
 import { BasketItem } from '../../../core/models/basket.model';
+import { Category } from '../../../core/models/category.model';
+import { CategoryService } from '../../../core/services/categoryservice.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -36,22 +38,8 @@ export class ProductListComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private wishlistService = inject(WishlistService);
   private toast = inject(ToastService);
+  private categoryService = inject(CategoryService);
   private search$ = new Subject<string>();
-
-
-  @ViewChild('categoryStrip')
-categoryStrip!: ElementRef<HTMLDivElement>;
-
-// scrollCategories(direction: 'left' | 'right'): void {
-//   const container = this.categoryStrip?.nativeElement;
-
-//   if (!container) return;
-
-//   container.scrollBy({
-//     left: direction === 'right' ? 250 : -250,
-//     behavior: 'smooth'
-//   });
-// }
 
   // Products
   products$ = this.store.select(selectAllProducts);
@@ -59,7 +47,18 @@ categoryStrip!: ElementRef<HTMLDivElement>;
   categories$ = this.store.select(selectCategories);
   loading$ = this.store.select(selectProductsLoading);
   paging$ = this.store.select(selectProductsPaging);
+  @ViewChild('categoryStrip')
+categoryStrip!: ElementRef<HTMLDivElement>;
+// Scroll categories using arrows
+scrollCategories(direction: 'left' | 'right'): void {
+  const container = this.categoryStrip?.nativeElement;
+  if (!container) return;
 
+  container.scrollBy({
+    left: direction === 'left' ? -250 : 250,
+    behavior: 'smooth'
+  });
+}
   // Filters
   searchValue = '';
   selectedBrandId = 0;
@@ -83,11 +82,47 @@ categoryStrip!: ElementRef<HTMLDivElement>;
       .subscribe(items => (this.basketItems = items));
 
     this.store.dispatch(ProductsActions.loadLookups());
+    this.loadMoreCategories();
     this.load(1);
 
     this.search$
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.load(1));
+  }
+
+  // ---- category chips: 10 at a time; the arrow asks the API for the next 10 ----
+  chipCategories: Category[] = [];
+  chipPage = 0;
+  chipHasMore = true;
+  chipLoading = false;
+  private readonly chipPageSize = 10;
+
+  loadMoreCategories(): void {
+    if (this.chipLoading || !this.chipHasMore) return;
+    this.chipLoading = true;
+    const next = this.chipPage + 1;
+
+    this.categoryService.getCategories(next, this.chipPageSize).subscribe({
+      next: res => {
+        const known = new Set(this.chipCategories.map(c => c.id));
+        const fresh = (res?.data ?? []).filter(c => !known.has(c.id));
+        this.chipCategories = [...this.chipCategories, ...fresh];
+        this.chipPage = next;
+        // more pages exist unless the API says this was the last one (or gave nothing new)
+        this.chipHasMore = fresh.length > 0 && (res?.totalPages ? next < res.totalPages : (res?.data?.length ?? 0) >= this.chipPageSize);
+        this.chipLoading = false;
+
+        // bring the first newly added chip into view
+        if (next > 1 && fresh.length) {
+          setTimeout(() => document.querySelector(`.cat-chip[data-id="${fresh[0].id}"]`)
+            ?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }));
+        }
+      },
+      error: () => {
+        this.chipLoading = false;
+        this.toast.error('تعذر تحميل المزيد من الفئات');
+      }
+    });
   }
 
   readonly starSlots = [1, 2, 3, 4, 5];
@@ -97,16 +132,7 @@ categoryStrip!: ElementRef<HTMLDivElement>;
     this.selectedCategoryId = id;
     this.load(1);
   }
-// Scroll categories using arrows
-scrollCategories(direction: 'left' | 'right'): void {
-  const container = this.categoryStrip?.nativeElement;
-  if (!container) return;
 
-  container.scrollBy({
-    left: direction === 'left' ? -250 : 250,
-    behavior: 'smooth'
-  });
-}
   isLowStock(product: Product): boolean {
     return product.stockQuantity > 0 && product.stockQuantity <= 5;
   }

@@ -106,20 +106,19 @@
 
         </div>
 
-<!-- Old Price -->
-<div class="col-md-3">
-  <label class="form-label">
-    السعر القديم
-  </label>
+        <!-- Price -->
+        <div class="col-md-3">
 
-  <input
-    type="number"
-    class="form-control"
-    [(ngModel)]="selectedProduct.oldPrice"
-    min="0"
-    step="0.01"
-    placeholder="السعر قبل الخصم">
-</div>
+          <label class="form-label">
+            السعر القديم
+          </label>
+
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="selectedProduct.oldPrice">
+
+        </div>
 
 
         <!-- Stock -->
@@ -371,7 +370,6 @@
               <th>الصورة</th>
               <th>المنتج</th>
               <th>السعر</th>
-              <th>السعر القديم</th>
               <th>الكمية</th>
               <th>Actions</th>
 
@@ -422,9 +420,7 @@
                 {{ product.price }} EGP
               </td>
 
-              <td>
-                {{ product.oldPrice }} EGP
-              </td>
+
               <!-- Stock -->
               <td>
                 {{ product.stockQuantity }}

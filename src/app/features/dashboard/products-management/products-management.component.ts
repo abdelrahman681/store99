@@ -291,10 +291,10 @@ this.productService
         description:
           productDetails.description,
 
-        price:productDetails.price,
-          
-        oldPrice:productDetails.oldPrice,
-          
+        price:
+          productDetails.price,
+        oldPrice:
+          productDetails.oldPrice,
         productBrandId:
           (productDetails as any)
             .productBrandId ?? 0,

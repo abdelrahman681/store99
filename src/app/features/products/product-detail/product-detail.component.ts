@@ -14,7 +14,7 @@ import { WishlistService } from '../../../core/services/wishlist.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Product } from '../../../core/models/product.model';
-import { productIdFromParam, productSlug } from '../../../core/utils/product-slug';
+import { productSlug } from '../../../core/utils/product-slug';
 import { ProductReviewsComponent } from '../../../shared/components/product-reviews/product-reviews.component';
 import { BasketItem } from '../../../core/models/basket.model';
 
@@ -38,15 +38,21 @@ export class ProductDetailComponent implements OnInit {
   loading = true;
   readonly starSlots = [1, 2, 3, 4, 5];
 
-  // the URL segment is "10-iphone-15" (or just "10"): the number in front is the product id
+  // the URL segment is the product name ("ice-cream-friday"); the id is only known once it is resolved
   private routeParam = this.route.snapshot.paramMap.get('id');
-  productId = productIdFromParam(this.routeParam) ?? 0;
+  productId = 0;
   private refresh$ = new BehaviorSubject<void>(undefined);
 
   product$ = this.refresh$.pipe(
-    switchMap(() =>
-      this.productService.getProductById(this.productId).pipe(
+    switchMap(() => {
+      // first load: resolve the slug. After that (e.g. a review changed) the id is known.
+      const source$ = this.productId
+        ? this.productService.getProductById(this.productId)
+        : this.productService.getProductBySlug(this.routeParam ?? '');
+
+      return source$.pipe(
         tap(product => {
+          this.productId = product.id;
           this.loading = false;
           this.showNameInUrl(product);
         }),
@@ -56,11 +62,11 @@ export class ProductDetailComponent implements OnInit {
           this.router.navigate(['/products']);
           return EMPTY;
         })
-      )
-    )
+      );
+    })
   );
 
-  /** /products/10 -> /products/10-iphone-15 (no navigation, no extra history entry), and the tab title */
+  /** old /products/10 → /products/iphone-15 (no navigation, no extra history entry), and the tab title */
   private showNameInUrl(product: Product): void {
     this.titleService.setTitle(`${product.name} | Store99`);
 
