@@ -1,6 +1,6 @@
 import { ProductPathPipe } from '../../../shared/pipes/product-path.pipe';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -37,6 +37,21 @@ export class ProductListComponent implements OnInit {
   private wishlistService = inject(WishlistService);
   private toast = inject(ToastService);
   private search$ = new Subject<string>();
+
+
+  @ViewChild('categoryStrip')
+categoryStrip!: ElementRef<HTMLDivElement>;
+
+scrollCategories(direction: 'left' | 'right'): void {
+  const container = this.categoryStrip?.nativeElement;
+
+  if (!container) return;
+
+  container.scrollBy({
+    left: direction === 'right' ? 250 : -250,
+    behavior: 'smooth'
+  });
+}
 
   // Products
   products$ = this.store.select(selectAllProducts);
