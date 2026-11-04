@@ -92,6 +92,7 @@ export class ProductService {
     name: string;
     description: string;
     price: number;
+    oldPrice: number;
     productBrandId: number;
     productCategoryId: number;
     stockQuantity: number;
@@ -113,6 +114,10 @@ export class ProductService {
     formData.append(
       'Price',
       product.price.toString()
+    );
+    formData.append(
+      'OldPrice',
+      product.oldPrice.toString()
     );
 
     formData.append(

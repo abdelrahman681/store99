@@ -91,7 +91,7 @@ export class DashboardComponent implements OnInit {
     oldPrice: [
       0,
       [
-        Validators.min(1)
+        Validators.min(0)
       ]
     ],
     productBrandId: [
@@ -114,7 +114,7 @@ export class DashboardComponent implements OnInit {
       0,
       [
         Validators.required,
-        Validators.min(1)
+        Validators.min(0)
       ]
     ]
   });
