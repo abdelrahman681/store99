@@ -42,16 +42,16 @@ export class ProductListComponent implements OnInit {
   @ViewChild('categoryStrip')
 categoryStrip!: ElementRef<HTMLDivElement>;
 
-scrollCategories(direction: 'left' | 'right'): void {
-  const container = this.categoryStrip?.nativeElement;
+// scrollCategories(direction: 'left' | 'right'): void {
+//   const container = this.categoryStrip?.nativeElement;
 
-  if (!container) return;
+//   if (!container) return;
 
-  container.scrollBy({
-    left: direction === 'right' ? 250 : -250,
-    behavior: 'smooth'
-  });
-}
+//   container.scrollBy({
+//     left: direction === 'right' ? 250 : -250,
+//     behavior: 'smooth'
+//   });
+// }
 
   // Products
   products$ = this.store.select(selectAllProducts);
@@ -97,7 +97,16 @@ scrollCategories(direction: 'left' | 'right'): void {
     this.selectedCategoryId = id;
     this.load(1);
   }
+// Scroll categories using arrows
+scrollCategories(direction: 'left' | 'right'): void {
+  const container = this.categoryStrip?.nativeElement;
+  if (!container) return;
 
+  container.scrollBy({
+    left: direction === 'left' ? -250 : 250,
+    behavior: 'smooth'
+  });
+}
   isLowStock(product: Product): boolean {
     return product.stockQuantity > 0 && product.stockQuantity <= 5;
   }
