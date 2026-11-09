@@ -1,4 +1,3 @@
-
 import { ProductPathPipe } from '../../../shared/pipes/product-path.pipe';
 import { CommonModule } from '@angular/common';
 import {
@@ -13,7 +12,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  Subject,
+  switchMap,
+  of,
+  catchError,
+  finalize
+} from 'rxjs';
 
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { HeroArtComponent } from '../../../shared/components/hero-art/hero-art.component';
@@ -36,6 +43,7 @@ import { BasketItem } from '../../../core/models/basket.model';
 import { Category } from '../../../core/models/category.model';
 
 import { CategoryService } from '../../../core/services/categoryservice.service';
+import { ProductService } from '../../../core/services/product.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -60,10 +68,11 @@ export class ProductListComponent implements OnInit {
   private wishlistService = inject(WishlistService);
   private toast = inject(ToastService);
   private categoryService = inject(CategoryService);
+  private productService = inject(ProductService);
 
   private search$ = new Subject<string>();
 
-  // Products
+  // Products - القائمة الرئيسية فقط
   products$ = this.store.select(selectAllProducts);
   brands$ = this.store.select(selectBrands);
   categories$ = this.store.select(selectCategories);
@@ -79,8 +88,11 @@ export class ProductListComponent implements OnInit {
   selectedCategoryId = 0;
   sort: SortOption | '' = '';
 
-  // Search autocomplete
+  // Search autocomplete - منفصل عن القائمة الرئيسية
   showSearchSuggestions = false;
+  searchSuggestions: Product[] = [];
+  searchLoading = false;
+
   readonly minimumSearchLength = 3;
 
   // Basket
@@ -92,8 +104,8 @@ export class ProductListComponent implements OnInit {
   readonly starSlots = [1, 2, 3, 4, 5];
 
   get hasFilters(): boolean {
+    // البحث هنا خاص بالاقتراحات فقط، وليس فلترًا للقائمة الرئيسية
     return !!(
-      this.searchValue.trim().length >= this.minimumSearchLength ||
       this.selectedBrandId ||
       this.selectedCategoryId ||
       this.sort
@@ -115,15 +127,35 @@ export class ProductListComponent implements OnInit {
 
     this.load(1);
 
-    // Live search with debounce
+    // Search suggestions - API مستقل عن NgRx products list
     this.search$
       .pipe(
         debounceTime(400),
         distinctUntilChanged(),
+
+        switchMap(value => {
+
+          if (value.length < this.minimumSearchLength) {
+            this.searchLoading = false;
+            return of([]);
+          }
+
+          this.searchLoading = true;
+
+          return this.productService
+            .searchProductSuggestions(value)
+            .pipe(
+              catchError(() => of([])),
+              finalize(() => {
+                this.searchLoading = false;
+              })
+            );
+        }),
+
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(() => {
-        this.load(1);
+      .subscribe(products => {
+        this.searchSuggestions = products;
       });
   }
 
@@ -157,6 +189,7 @@ export class ProductListComponent implements OnInit {
     const next = this.chipPage + 1;
 
     this.categoryService.getCategories(next, this.chipPageSize)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
 
         next: res => {
@@ -229,21 +262,28 @@ export class ProductListComponent implements OnInit {
 
     const value = this.searchValue.trim();
 
-    if (value.length >= this.minimumSearchLength) {
-
-      this.showSearchSuggestions = true;
-
-      this.search$.next(value);
-
-    } else {
+    if (value.length < this.minimumSearchLength) {
 
       this.showSearchSuggestions = false;
+      this.searchSuggestions = [];
+      this.searchLoading = false;
 
-      // Cancel the previous pending search logically
+      // إلغاء أي بحث سابق بعد انتهاء debounce
       this.search$.next('');
 
-      // Restore the normal product list
-      this.load(1);
+      return;
+    }
+
+    this.showSearchSuggestions = true;
+
+    // البحث هنا لا يستدعي load() ولا يغير القائمة الرئيسية
+    this.search$.next(value);
+  }
+
+  onSearchFocus(): void {
+
+    if (this.searchValue.trim().length >= this.minimumSearchLength) {
+      this.showSearchSuggestions = true;
     }
   }
 
@@ -255,6 +295,7 @@ export class ProductListComponent implements OnInit {
   selectSearchProduct(): void {
 
     this.closeSearchSuggestions();
+    this.searchSuggestions = [];
   }
 
   // ================= FILTERS =================
@@ -267,13 +308,12 @@ export class ProductListComponent implements OnInit {
   resetFilters(): void {
 
     this.searchValue = '';
-
     this.showSearchSuggestions = false;
+    this.searchSuggestions = [];
+    this.searchLoading = false;
 
     this.selectedBrandId = 0;
-
     this.selectedCategoryId = 0;
-
     this.sort = '';
 
     this.search$.next('');
@@ -285,11 +325,6 @@ export class ProductListComponent implements OnInit {
 
   load(pageIndex: number): void {
 
-    const search = this.searchValue.trim();
-
-    const isSearching =
-      search.length >= this.minimumSearchLength;
-
     this.store.dispatch(
       ProductsActions.loadProducts({
 
@@ -297,12 +332,10 @@ export class ProductListComponent implements OnInit {
 
           pageIndex,
 
-          // Show more products during search
-          pageSize: isSearching ? 50 : 8,
+          // القائمة الرئيسية لا تتأثر بنص السيرش
+          pageSize: 8,
 
-          searchValue: isSearching
-            ? search
-            : undefined,
+          searchValue: undefined,
 
           productBrandId: this.selectedBrandId || undefined,
 
@@ -413,6 +446,7 @@ export class ProductListComponent implements OnInit {
 
     this.wishlistService
       .addProductToWishlist(product.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
 
         next: () => {

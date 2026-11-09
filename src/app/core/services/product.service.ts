@@ -298,7 +298,19 @@ export class ProductService {
     );
   }
 
+// =========================
+// Search Product Suggestions
+// =========================
 
+searchProductSuggestions(searchValue: string): Observable<Product[]> {
+  return this.getProducts({
+    pageIndex: 1,
+    pageSize: 50,
+    searchValue: searchValue.trim()
+  }).pipe(
+    map(response => response?.data ?? [])
+  );
+}
   // =========================
   // Delete Product
   // =========================

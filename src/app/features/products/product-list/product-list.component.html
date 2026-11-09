@@ -1,5 +1,49 @@
 
 <style>
+ .category-arrow {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  background: white;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  position: relative;
+  top: -5px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+  }
+}
+
+.category-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.cat-strip {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
   .search-autocomplete {
   position: relative;
 }
@@ -269,166 +313,94 @@
 
 }
 
-<!-- ================= FILTERS ================= -->
+<!-- SEARCH WITH AUTOCOMPLETE -->
 
-<section class="filters-card mb-4">
+<div class="col-12 col-lg-4">
 
-  <div class="row g-2">
+  <div class="search-box search-autocomplete">
 
-    <!-- SEARCH WITH AUTOCOMPLETE -->
+    <i class="bi bi-search"></i>
 
-    <div class="col-12 col-lg-4">
+    <input
+      class="form-control"
+      type="search"
+      placeholder="ابحث عن منتج..."
+      aria-label="بحث"
+      autocomplete="off"
+      [(ngModel)]="searchValue"
+      (ngModelChange)="onSearchChange()"
+      (focus)="onSearchFocus()"
+    />
 
-      <div class="search-box search-autocomplete">
+    @if (
+      searchValue.trim().length >= minimumSearchLength &&
+      showSearchSuggestions
+    ) {
 
-        <i class="bi bi-search"></i>
+      <div class="search-suggestions">
 
-        <input
-          class="form-control"
-          type="search"
-          placeholder="ابحث عن منتج..."
-          aria-label="بحث"
-          autocomplete="off"
-          [(ngModel)]="searchValue"
-          (ngModelChange)="onSearchChange()"
-          (focus)="showSearchSuggestions = searchValue.trim().length >= 3"
-        />
+        @if (searchLoading) {
 
-        @if (
-          searchValue.trim().length >= 3 &&
-          showSearchSuggestions
-        ) {
+          <div class="search-suggestion-message">
 
-          <div class="search-suggestions">
+            <span class="spinner-border spinner-border-sm me-2"></span>
 
-            @if (loading$ | async) {
+            جاري البحث...
 
-              <div class="search-suggestion-message">
+          </div>
 
-                <span class="spinner-border spinner-border-sm me-2"></span>
+        } @else {
 
-                جاري البحث...
+          @if (searchSuggestions.length > 0) {
 
-              </div>
+            @for (p of searchSuggestions; track p.id) {
 
-            } @else {
+              <a
+                class="search-suggestion-item"
+                [routerLink]="p.id | productPath: p.name"
+                (click)="selectSearchProduct()">
 
-              @if ((products$ | async); as suggestions) {
+                <img
+                  [src]="p.pictureUrl"
+                  [alt]="p.name"
+                  loading="lazy"
+                />
 
-                @if (suggestions.length > 0) {
+                <div class="search-suggestion-info">
 
-                  @for (p of suggestions; track p.id) {
+                  <span>{{ p.name }}</span>
 
-                    <a
-                      class="search-suggestion-item"
-                      [routerLink]="p.id | productPath: p.name"
-                      (click)="selectSearchProduct()">
-
-                      <img
-                        [src]="p.pictureUrl"
-                        [alt]="p.name"
-                        loading="lazy"
-                      />
-
-                      <div class="search-suggestion-info">
-
-                        <span>{{ p.name }}</span>
-
-                        @if (p.brandName) {
-                          <small>{{ p.brandName }}</small>
-                        }
-
-                      </div>
-
-                      <strong>
-                        {{ p.price | number:'1.0-2' }} ج.م
-                      </strong>
-
-                    </a>
-
+                  @if (p.brandName) {
+                    <small>{{ p.brandName }}</small>
                   }
 
-                } @else {
+                </div>
 
-                  <div class="search-suggestion-message">
-                    لا توجد منتجات مطابقة لبحثك
-                  </div>
+                <strong>
+                  {{ p.price | number:'1.0-2' }} ج.م
+                </strong>
 
-                }
-
-              }
+              </a>
 
             }
 
-          </div>
+          } @else {
+
+            <div class="search-suggestion-message">
+              لا توجد منتجات مطابقة لبحثك
+            </div>
+
+          }
 
         }
 
       </div>
 
-    </div>
-
-    <!-- BRAND -->
-
-    <div class="col-6 col-lg-4">
-
-      <select
-        class="form-select"
-        aria-label="الماركة"
-        [(ngModel)]="selectedBrandId"
-        (change)="onFilterChange()">
-
-        <option [ngValue]="0">كل الماركات</option>
-
-        @for (b of (brands$ | async) ?? []; track b.id) {
-
-          <option [ngValue]="b.id">
-            {{ b.name }}
-          </option>
-
-        }
-
-      </select>
-
-    </div>
-
-    <!-- SORT -->
-
-    <div class="col-6 col-lg-4">
-
-      <select
-        class="form-select"
-        aria-label="الترتيب"
-        [(ngModel)]="sort"
-        (change)="onFilterChange()">
-
-        <option value="">الترتيب: افتراضي</option>
-        <option value="PriceAsc">السعر: من الأقل</option>
-        <option value="PriceDesc">السعر: من الأعلى</option>
-        <option value="NameAsc">الاسم: أ - ي</option>
-        <option value="NameDesc">الاسم: ي - أ</option>
-
-      </select>
-
-    </div>
+    }
 
   </div>
 
-  @if (hasFilters) {
-
-    <button
-      type="button"
-      class="btn btn-sm btn-link text-decoration-none px-0 mt-2"
-      (click)="resetFilters()">
-
-      <i class="bi bi-x-circle me-1"></i>
-      مسح الفلاتر
-
-    </button>
-
-  }
-
-</section>
+</div>
 
 <!-- ================= LOADING ================= -->
 
@@ -662,7 +634,7 @@
 
 <!-- ================= PAGINATION ================= -->
 
-@if (paging && searchValue.trim().length < 3) {
+@if (paging) {
 
   <app-pagination
     [pageIndex]="paging.pageIndex"
