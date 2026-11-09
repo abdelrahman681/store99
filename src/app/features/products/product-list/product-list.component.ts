@@ -1,6 +1,14 @@
+
 import { ProductPathPipe } from '../../../shared/pipes/product-path.pipe';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  ElementRef,
+  ViewChild
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -10,6 +18,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { HeroArtComponent } from '../../../shared/components/hero-art/hero-art.component';
 import { IllustrationComponent } from '../../../shared/components/illustration/illustration.component';
+
 import { ProductsActions } from '../../../store/products/products.actions';
 import {
   selectAllProducts,
@@ -18,11 +27,14 @@ import {
   selectProductsLoading,
   selectProductsPaging
 } from '../../../store/products/products.selectors';
+
 import { BasketActions } from '../../../store/basket/basket.actions';
 import { selectBasketItems } from '../../../store/basket/basket.selectors';
+
 import { SortOption, Product } from '../../../core/models/product.model';
 import { BasketItem } from '../../../core/models/basket.model';
 import { Category } from '../../../core/models/category.model';
+
 import { CategoryService } from '../../../core/services/categoryservice.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -30,15 +42,25 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PaginationComponent, ProductPathPipe, HeroArtComponent, IllustrationComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    PaginationComponent,
+    ProductPathPipe,
+    HeroArtComponent,
+    IllustrationComponent
+  ],
   templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {
+
   private store = inject(Store);
   private destroyRef = inject(DestroyRef);
   private wishlistService = inject(WishlistService);
   private toast = inject(ToastService);
   private categoryService = inject(CategoryService);
+
   private search$ = new Subject<string>();
 
   // Products
@@ -47,180 +69,384 @@ export class ProductListComponent implements OnInit {
   categories$ = this.store.select(selectCategories);
   loading$ = this.store.select(selectProductsLoading);
   paging$ = this.store.select(selectProductsPaging);
-  @ViewChild('categoryStrip')
-categoryStrip!: ElementRef<HTMLDivElement>;
-// Scroll categories using arrows
-scrollCategories(direction: 'left' | 'right'): void {
-  const container = this.categoryStrip?.nativeElement;
-  if (!container) return;
 
-  container.scrollBy({
-    left: direction === 'left' ? -250 : 250,
-    behavior: 'smooth'
-  });
-}
+  @ViewChild('categoryStrip')
+  categoryStrip!: ElementRef<HTMLDivElement>;
+
   // Filters
   searchValue = '';
   selectedBrandId = 0;
   selectedCategoryId = 0;
   sort: SortOption | '' = '';
 
-  // Basket (used to stop adding more than the available stock)
+  // Search autocomplete
+  showSearchSuggestions = false;
+  readonly minimumSearchLength = 3;
+
+  // Basket
   basketItems: BasketItem[] = [];
 
-  // placeholders shown while the first page is loading
+  // Loading placeholders
   readonly skeletons = Array.from({ length: 8 });
 
+  readonly starSlots = [1, 2, 3, 4, 5];
+
   get hasFilters(): boolean {
-    return !!(this.searchValue || this.selectedBrandId || this.selectedCategoryId || this.sort);
+    return !!(
+      this.searchValue.trim().length >= this.minimumSearchLength ||
+      this.selectedBrandId ||
+      this.selectedCategoryId ||
+      this.sort
+    );
   }
 
   ngOnInit(): void {
+
     this.store
       .select(selectBasketItems)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(items => (this.basketItems = items));
+      .subscribe(items => {
+        this.basketItems = items;
+      });
 
     this.store.dispatch(ProductsActions.loadLookups());
+
     this.loadMoreCategories();
+
     this.load(1);
 
+    // Live search with debounce
     this.search$
-      .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.load(1));
+      .pipe(
+        debounceTime(400),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.load(1);
+      });
   }
 
-  // ---- category chips: 10 at a time; the arrow asks the API for the next 10 ----
+  // ================= CATEGORY CHIPS =================
+
   chipCategories: Category[] = [];
   chipPage = 0;
   chipHasMore = true;
   chipLoading = false;
+
   private readonly chipPageSize = 10;
 
-  loadMoreCategories(): void {
-    if (this.chipLoading || !this.chipHasMore) return;
-    this.chipLoading = true;
-    const next = this.chipPage + 1;
+  scrollCategories(direction: 'left' | 'right'): void {
 
-    this.categoryService.getCategories(next, this.chipPageSize).subscribe({
-      next: res => {
-        const known = new Set(this.chipCategories.map(c => c.id));
-        const fresh = (res?.data ?? []).filter(c => !known.has(c.id));
-        this.chipCategories = [...this.chipCategories, ...fresh];
-        this.chipPage = next;
-        // more pages exist unless the API says this was the last one (or gave nothing new)
-        this.chipHasMore = fresh.length > 0 && (res?.totalPages ? next < res.totalPages : (res?.data?.length ?? 0) >= this.chipPageSize);
-        this.chipLoading = false;
+    const container = this.categoryStrip?.nativeElement;
 
-        // bring the first newly added chip into view
-        if (next > 1 && fresh.length) {
-          setTimeout(() => document.querySelector(`.cat-chip[data-id="${fresh[0].id}"]`)
-            ?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }));
-        }
-      },
-      error: () => {
-        this.chipLoading = false;
-        this.toast.error('تعذر تحميل المزيد من الفئات');
-      }
+    if (!container) return;
+
+    container.scrollBy({
+      left: direction === 'left' ? -250 : 250,
+      behavior: 'smooth'
     });
   }
 
-  readonly starSlots = [1, 2, 3, 4, 5];
+  loadMoreCategories(): void {
 
-  /** category chips under the hero: picking one filters the list (0 = all) */
+    if (this.chipLoading || !this.chipHasMore) return;
+
+    this.chipLoading = true;
+
+    const next = this.chipPage + 1;
+
+    this.categoryService.getCategories(next, this.chipPageSize)
+      .subscribe({
+
+        next: res => {
+
+          const known = new Set(
+            this.chipCategories.map(c => c.id)
+          );
+
+          const fresh = (res?.data ?? [])
+            .filter(c => !known.has(c.id));
+
+          this.chipCategories = [
+            ...this.chipCategories,
+            ...fresh
+          ];
+
+          this.chipPage = next;
+
+          this.chipHasMore =
+            fresh.length > 0 &&
+            (
+              res?.totalPages
+                ? next < res.totalPages
+                : (res?.data?.length ?? 0) >= this.chipPageSize
+            );
+
+          this.chipLoading = false;
+
+          if (next > 1 && fresh.length) {
+
+            setTimeout(() => {
+
+              document
+                .querySelector(
+                  `.cat-chip[data-id="${fresh[0].id}"]`
+                )
+                ?.scrollIntoView({
+                  behavior: 'smooth',
+                  inline: 'center',
+                  block: 'nearest'
+                });
+
+            });
+
+          }
+
+        },
+
+        error: () => {
+
+          this.chipLoading = false;
+
+          this.toast.error('تعذر تحميل المزيد من الفئات');
+
+        }
+
+      });
+  }
+
   pickCategory(id: number): void {
+
     this.selectedCategoryId = id;
+
     this.load(1);
   }
 
-  isLowStock(product: Product): boolean {
-    return product.stockQuantity > 0 && product.stockQuantity <= 5;
-  }
-
-  scrollToProducts(): void {
-    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  // ================= SEARCH =================
 
   onSearchChange(): void {
-    this.search$.next(this.searchValue);
+
+    const value = this.searchValue.trim();
+
+    if (value.length >= this.minimumSearchLength) {
+
+      this.showSearchSuggestions = true;
+
+      this.search$.next(value);
+
+    } else {
+
+      this.showSearchSuggestions = false;
+
+      // Cancel the previous pending search logically
+      this.search$.next('');
+
+      // Restore the normal product list
+      this.load(1);
+    }
   }
 
+  closeSearchSuggestions(): void {
+
+    this.showSearchSuggestions = false;
+  }
+
+  selectSearchProduct(): void {
+
+    this.closeSearchSuggestions();
+  }
+
+  // ================= FILTERS =================
+
   onFilterChange(): void {
+
     this.load(1);
   }
 
   resetFilters(): void {
+
     this.searchValue = '';
+
+    this.showSearchSuggestions = false;
+
     this.selectedBrandId = 0;
+
     this.selectedCategoryId = 0;
+
     this.sort = '';
+
+    this.search$.next('');
+
     this.load(1);
   }
 
+  // ================= PRODUCTS =================
+
   load(pageIndex: number): void {
+
+    const search = this.searchValue.trim();
+
+    const isSearching =
+      search.length >= this.minimumSearchLength;
+
     this.store.dispatch(
       ProductsActions.loadProducts({
+
         query: {
+
           pageIndex,
-          pageSize: 8,
-          searchValue: this.searchValue || undefined,
+
+          // Show more products during search
+          pageSize: isSearching ? 50 : 8,
+
+          searchValue: isSearching
+            ? search
+            : undefined,
+
           productBrandId: this.selectedBrandId || undefined,
+
           productCategoryId: this.selectedCategoryId || undefined,
+
           sort: this.sort || undefined
+
         }
+
       })
     );
-    if (pageIndex > 1) window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (pageIndex > 1) {
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+
+    }
   }
 
+  // ================= STOCK =================
+
   private quantityInBasket(product: Product): number {
-    return this.basketItems.find(item => item.productId === product.id)?.quantity ?? 0;
+
+    return this.basketItems.find(
+      item => item.productId === product.id
+    )?.quantity ?? 0;
+  }
+
+  isLowStock(product: Product): boolean {
+
+    return product.stockQuantity > 0 &&
+      product.stockQuantity <= 5;
   }
 
   isAtStockLimit(product: Product): boolean {
+
     return this.quantityInBasket(product) >= product.stockQuantity;
   }
 
+  // ================= SCROLL =================
+
+  scrollToProducts(): void {
+
+    document
+      .getElementById('products')
+      ?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+  }
+
+  // ================= BASKET =================
+
   addToBasket(product: Product): void {
+
     if (product.stockQuantity <= 0) {
+
       this.toast.error('المنتج غير متوفر حالياً');
+
       return;
     }
 
-    if (this.quantityInBasket(product) + 1 > product.stockQuantity) {
-      this.toast.warning(`لا يمكن إضافة المزيد. المتاح فقط ${product.stockQuantity} قطعة`);
+    if (
+      this.quantityInBasket(product) + 1 >
+      product.stockQuantity
+    ) {
+
+      this.toast.warning(
+        `لا يمكن إضافة المزيد. المتاح فقط ${product.stockQuantity} قطعة`
+      );
+
       return;
     }
 
-    // the "added to basket" toast is shown by BasketEffects
     this.store.dispatch(
       BasketActions.addItemToBasket({
+
         item: {
+
           id: product.id,
+
           productId: product.id,
+
           name: product.name,
+
           pictureUrl: product.pictureUrl,
+
           brand: product.brandName ?? '',
+
           category: product.categoryName ?? '',
+
           price: product.price,
+
           quantity: 1
+
         }
+
       })
     );
   }
 
+  // ================= WISHLIST =================
+
   addToWishlist(product: Product): void {
-    this.wishlistService.addProductToWishlist(product.id).subscribe({
-      next: () => this.toast.success('تمت إضافة المنتج إلى المفضلة ❤️'),
-      error: err => {
-        if (err?.status === 401) {
-          this.toast.info('سجّل دخولك الأول عشان تضيف للمفضلة');
-        } else if (err?.status === 400) {
-          this.toast.info('المنتج موجود بالفعل في المفضلة ❤️');
-        } else {
-          this.toast.error('حدث خطأ أثناء إضافة المنتج إلى المفضلة');
+
+    this.wishlistService
+      .addProductToWishlist(product.id)
+      .subscribe({
+
+        next: () => {
+
+          this.toast.success(
+            'تمت إضافة المنتج إلى المفضلة ❤️'
+          );
+
+        },
+
+        error: err => {
+
+          if (err?.status === 401) {
+
+            this.toast.info(
+              'سجّل دخولك الأول عشان تضيف للمفضلة'
+            );
+
+          } else if (err?.status === 400) {
+
+            this.toast.info(
+              'المنتج موجود بالفعل في المفضلة ❤️'
+            );
+
+          } else {
+
+            this.toast.error(
+              'حدث خطأ أثناء إضافة المنتج إلى المفضلة'
+            );
+
+          }
+
         }
-      }
-    });
+
+      });
   }
 }
