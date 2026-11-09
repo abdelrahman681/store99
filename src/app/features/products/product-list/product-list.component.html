@@ -313,6 +313,12 @@
 
 }
 
+<!-- ================= FILTERS ================= -->
+
+<section class="filters-card mb-4">
+
+  <div class="row g-2">
+
 <!-- SEARCH WITH AUTOCOMPLETE -->
 
 <div class="col-12 col-lg-4">
@@ -401,6 +407,68 @@
   </div>
 
 </div>
+
+    <!-- BRAND -->
+
+    <div class="col-6 col-lg-4">
+
+      <select
+        class="form-select"
+        aria-label="الماركة"
+        [(ngModel)]="selectedBrandId"
+        (change)="onFilterChange()">
+
+        <option [ngValue]="0">كل الماركات</option>
+
+        @for (b of (brands$ | async) ?? []; track b.id) {
+
+          <option [ngValue]="b.id">
+            {{ b.name }}
+          </option>
+
+        }
+
+      </select>
+
+    </div>
+
+    <!-- SORT -->
+
+    <div class="col-6 col-lg-4">
+
+      <select
+        class="form-select"
+        aria-label="الترتيب"
+        [(ngModel)]="sort"
+        (change)="onFilterChange()">
+
+        <option value="">الترتيب: افتراضي</option>
+        <option value="PriceAsc">السعر: من الأقل</option>
+        <option value="PriceDesc">السعر: من الأعلى</option>
+        <option value="NameAsc">الاسم: أ - ي</option>
+        <option value="NameDesc">الاسم: ي - أ</option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+  @if (hasFilters) {
+
+    <button
+      type="button"
+      class="btn btn-sm btn-link text-decoration-none px-0 mt-2"
+      (click)="resetFilters()">
+
+      <i class="bi bi-x-circle me-1"></i>
+      مسح الفلاتر
+
+    </button>
+
+  }
+
+</section>
 
 <!-- ================= LOADING ================= -->
 
@@ -634,7 +702,7 @@
 
 <!-- ================= PAGINATION ================= -->
 
-@if (paging) {
+@if (paging && searchValue.trim().length < 3) {
 
   <app-pagination
     [pageIndex]="paging.pageIndex"
